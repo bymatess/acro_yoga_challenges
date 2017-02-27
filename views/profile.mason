@@ -1,0 +1,43 @@
+<!-- Here define your next vars --!>
+<%args>
+$settings
+$session
+$request
+$params => {}
+$basic_info
+$information #ref to array of records $information[0] = ($headline, $description, $answer)
+$photo_id => "1" #default avatar id in db
+</%args>
+%# use Data::Dumper; print Dumper($session);
+
+<& comp/show_basic_profile.mason, photo_id => $photo_id, basic_info => $basic_info, session => $session &>
+
+<!-- For questions from u_i_r --!>
+% my $previous_question;
+% for my $record (@{$information}) {
+%	my ($headline, $description, $answer) = @$record;
+%	if ($previous_question && $headline eq $previous_question) {
+%	# more answers to one question - continuing in one div
+		<br>
+		<% $answer %>
+%	} else { # first (new) question, open div (close the previous)
+%		if ($previous_question) { # closing div class="profile-question-body"
+			</div>
+%		}
+		<div class="profile-question-head">
+		<h3 class="profile-question-h3"><% $headline %></h3>
+		</div>
+		<p class="small-note"><% $description %></p>
+		<div class="profile-question-body">
+			<% $answer %>
+%	}
+%	$previous_question = $headline;	
+% }
+% if (scalar @{$information}) {
+	</div>
+% } else {
+	<div><b>User didn't provide any more information</b></div>
+% }
+<!-- end questions from u_i_r --!>
+
+

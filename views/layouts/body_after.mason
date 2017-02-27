@@ -1,0 +1,19 @@
+<%args>
+</%args>
+
+                </div> <!-- closing the main div with content --!>
+                <div class=rightColumn>
+                        <div class=white-box>
+D
+                        </div>
+                        <div class=white-box>
+E
+                        </div>
+                        <div class=white-box>
+F
+                        </div>
+                </div>
+        </div>
+</body>
+
+</html>

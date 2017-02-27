@@ -1,0 +1,48 @@
+<!-- Here define your next vars --!>
+<%args>
+$settings
+$session
+$request
+$params => {}
+$vars => {}
+$questions => {} #hashref with questions
+$answers => {} #hashref with answers to choose from
+$users_answers => {} #user's previous answers to questions
+$photo_id => "1"
+</%args>
+%# if you want to know what's inside those vars delete the following '#'
+%# use Data::Dumper;
+%# print Dumper($questions)."<br>";
+%# print Dumper($answers)."<br>";
+%# print Dumper($users_answers);
+
+<form action="<% $request->{path_info} %>" method=post>
+<!-- basic information - not editable except "about"--!>
+<& comp/show_basic_profile.mason, photo_id => $photo_id, basic_info => $session->{user}, session => $session, edit => 1 &>
+<!-- end basic information --!>
+
+% for my $question_id (sort keys %$questions) {
+                <b><% $questions->{$question_id}->{headline} %></b>
+		<br>
+		<% $questions->{$question_id}->{description} %> 
+		<br>
+%                if ($questions->{$question_id}->{options}) {
+%                        # must go through answers and chech those user already filled in
+                <select name=question_<% $question_id %> multiple='multiple'>
+%                        for my $answer_id (sort keys %{$answers->{$question_id}}) {
+%                                my $selected = "";
+%                                if ($users_answers->{$question_id}->{$answer_id}) {
+%                                        $selected = "selected='selected'";
+%                                }
+<option value=<% $answer_id %> <% $selected %> ><% $answers->{$question_id}->{$answer_id} %></option>
+%                        }
+                        </select><br>
+%                } else {
+%                        # just write user's answer to a textfield
+                                <textarea name=question_<% $question_id %> ><% $users_answers->{$question_id} %></textarea><br>
+%               }
+%        }
+<br>
+<input type=submit name=profile_edit value='Save'>
+</form>
+

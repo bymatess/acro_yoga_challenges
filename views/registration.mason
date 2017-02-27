@@ -1,0 +1,55 @@
+<!-- Here define your next vars --!>
+<%args>
+$settings
+$session
+$request
+$params
+</%args>
+
+<!-- Here insert your code --!>
+<h2>Create an account</h2>
+<form action="<% $request->{path_info} %>" method=post>
+<dl>
+<dt>E-mail:
+<dd><input type=text name=email value="" required="required" placeholder="Your e-mail" autocomplete="off" >
+<dt>Gender:
+<dd><label><input type=radio name=gender value="0" required="required" autocomplete="off" >Male</input>
+<dd><label><input type=radio name=gender value="1" required="required" autocomplete="off" >Female</input>
+<dt>First name:
+<dd><input type=text name=first_name value="" required="required" placeholder="Your first name" autocomplete="off">
+<dt>Last name:
+<dd><input type=text name=last_name value="" required="required" placeholder="Your last name" autocomplete="off">
+<dt>Date of birth:
+
+<dd><select name=birth_day required="required">
+<option value="">Day</option>
+% for(my $i=1; $i <=31; $i++) {
+	<option value=<% $i %> name=birth_day ><% $i %></option>
+% }
+</select>
+
+<select name=birth_month required="required">
+<option value="">Month</option>
+% for(my $i=1; $i <=12; $i++) {
+% my @months = qw(January February March April May June July August September October November December);
+	<option value=<% $i %> name=birth_month><% $months[$i-1] %></option>
+% }
+</select>
+
+<select name=birth_year required="required">
+<option selected="selected" value="">Year</option>
+% for(my $i=2014; $i >=1900; $i--) {
+	<option value=<% $i %> name=birth_year ><% $i %></option>
+% }
+</select>
+
+</dd>
+<dt>Password:
+<dd><input type=password name=password required="required" placeholder="Choose a password" autocomplete="off">
+<dt>Confirm your password:
+<dd><input type=password name=password_confirm required="required" placeholder="Confirm your password" autocomplete="off">
+<dd>&nbsp;</dd>
+<dd><input type=submit value=Next>
+</dl>
+</form>
+

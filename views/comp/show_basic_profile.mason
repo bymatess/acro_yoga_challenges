@@ -1,0 +1,54 @@
+<!-- Here define your next vars --!>
+<%args>
+$session
+$basic_info
+$photo_id => "1" #default avatar id in db
+$edit => "0"
+</%args>
+<!-- links --!>
+% if ($session->{'user'}->{id} eq $basic_info->{id}) {
+<div class="profile-links">
+% if (!$edit) {
+<a href="/user/profile/edit/">Edit</a>
+% }
+<a href="/user/upload_photo">Change&nbsp;photo</a>
+<a href="/user/change_password/">Change&nbsp;password</a>
+</div>
+% }
+<!-- basic information --!>
+<div class="profile-pic">
+<a href="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>">
+<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>" width="100" height="150">
+</a>
+</div>
+<div class="profile-basic">
+<h1 class="profile-basic-h1"><% $basic_info->{first_name} %> <% $basic_info->{last_name} %> </h1>
+<table class="profile-basic-table">
+<tr>
+<td>Birth day:</td>
+<td><% $basic_info->{birth_date} %></td>
+</tr>
+<tr>
+<td>E-mail:</td>
+<td><% $basic_info->{email} %></td>
+</tr>
+<tr>
+<td>Member since:</td>
+<td><% $basic_info->{confirmed} %></td>
+</tr>
+<tr>
+<td>About:</td>
+<td>
+% if ($edit) {
+<textarea name=about cols="12" rows=""><% $basic_info->{about} %></textarea>
+% } else {
+<% $basic_info->{about} %>
+% }
+</td>
+</tr>
+</table>
+</div>
+
+<div class=clear></div>
+<!-- end basic information --!>
+

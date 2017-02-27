@@ -1,0 +1,19 @@
+<!-- Here define your next vars --!>
+<%args>
+$settings
+$session
+$request
+$confirm_code
+$email
+</%args>
+<!-- Here insert your code --!>
+<h2>Please, confirm your e-mail</h2>
+<form action="/confirmation" method=post>
+	<dl>
+	<dt>E-mail: <% $email %></dt>
+	<dd><input type=submit value=Confirm>
+	<input type=hidden name=confirm_code value="<% $confirm_code %>" >
+	<input type=hidden name=email value="<% $email %>" >
+	</dl>
+</form>
+

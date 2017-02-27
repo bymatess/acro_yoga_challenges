@@ -1,0 +1,15 @@
+<!-- Here define your next vars --!>
+<%args>
+$event
+</%args>
+
+% # basic information about event to use everywhere except /event/show :-) or maybe even there
+<!-- Here insert your HTML --!>
+<div style="border: 1px solid black;">
+Event: <b><% $event->{headline} %></b><br>
+Agenda: <i>"<% $event->{description} %>"</i><br>
+Kind of event: <% $event->{kind_headline} %><br>
+Date: <% $event->{date_of_event} %><br>
+Time: <% $event->{time_of_event} %><br>
+</div>
+

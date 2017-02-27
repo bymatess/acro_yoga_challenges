@@ -1,0 +1,43 @@
+<!-- Here define your next vars --!>
+<%args>
+$basic_info
+$photo_id => "1" #default avatar id in db
+$is_author => "0"
+</%args>
+<!-- basic information --!>
+
+<div class=profile-container style="min-width: 300px; min-height: 80px; border: 1px solid red; margin: 3px;">
+<div class=small-pic>
+<a href="/user/profile/<% $basic_info->{id} %>" 
+	target="_blank"
+	title="<% $basic_info->{first_name}." ".$basic_info->{last_name} %>">
+<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>" width="40" height="60">
+</a>
+</div>
+% if ($is_author) {
+<div class="profile-basic">
+Message for you: <i><% $basic_info->{answer_text} %></i>
+<br>
+% if (defined $basic_info->{invitation}) {
+%	if ($basic_info->{invitation} eq '0') {
+You <span class=ko>rejected</span> application of this user.<br>
+% 	} else {
+You <span class=ok>approved</span> application of this user.<br>
+% 	}
+Message from you: <i><% $basic_info->{invitation_text} %></i>
+% } else {
+<form action="/application/answer/<% $basic_info->{event_id} %>" method="post">
+<label><input type=radio name="invitation_<% $basic_info->{id} %>" value="1" >Accept</input></label>
+ <label><input type=radio name="invitation_<% $basic_info->{id} %>" value="0" >Reject</input></label>
+<input type=hidden value="<% $basic_info->{id} %>" name="applications">
+<br>
+Note: <textarea name="invitation_text_<% $basic_info->{id} %>" placeholder="Please fill in your reasons for that answer..."></textarea>
+<br>
+<input type=submit value="Send" name=send_applications_answers>
+</form>
+% }
+</div>
+% }
+</div>
+<!-- end basic information --!>
+

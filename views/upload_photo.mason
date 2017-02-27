@@ -1,0 +1,16 @@
+<!-- Here define your next vars --!>
+<%args>
+$settings
+$session
+$request
+$params => {}
+$vars => {}
+</%args>
+
+<!-- Here insert your code --!>
+Please choose your new profile photo:
+<br>
+<form method=post enctype='multipart/form-data' action=<% $request->{path_info} %> >
+<input type=file name=photo> 
+<input type=submit value='Upload' name=upload>
+</form>

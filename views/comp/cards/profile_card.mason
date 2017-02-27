@@ -1,0 +1,33 @@
+<!-- Here define your next vars --!>
+<%args>
+$basic_info
+$photo_id => "1" #default avatar id in db
+</%args>
+<!-- basic information --!>
+
+<div class=profile-container style="width: 400px; height: 170px; border: 1px solid red; margin: 5px;">
+<div class="profile-pic">
+<a href="/user/profile/<% $basic_info->{id} %>">
+<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>" width="100" height="150">
+</a>
+</div>
+<div class="profile-basic">
+<table class="profile-basic-table">
+<tr>
+<td>Name:</td>
+<td><b><% $basic_info->{first_name}." ".$basic_info->{last_name} %></b></td>
+</tr>
+<tr>
+<td>About:</td>
+<td><% $basic_info->{about} %></td>
+</tr>
+<tr>
+<td>Location:</td>
+<td>TODO<% $basic_info->{location} %></td>
+</tr>
+</table>
+</div>
+<div class=clear></div>
+</div>
+<!-- end basic information --!>
+

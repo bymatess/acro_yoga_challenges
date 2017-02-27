@@ -1,0 +1,36 @@
+<%args>
+$cal => {} #hashref with events, keys are dates, value is hash of events , cause of easy sorting I add key "sort" ,and key url for links (just changed dots to '-' in date)
+</%args>
+<table class=table-events>
+<tr><th colspan=7>Coming events</td></th></tr>
+<tr>
+% my $j = 1;
+% for my $day (sort {$cal->{$a}->{sort} <=> $cal->{$b}->{sort}} keys %{$cal}) {
+% if ($j > 7) { $j = 1;
+</tr><tr>
+%}
+	<td>
+% my $i = 0;
+% if (scalar keys %{$cal->{$day}} > 2) { # there is 'sort' and 'url'
+<a href="/events/<% $cal->{$day}->{url} %>" title="Show all events"><% $day %></a><br>
+% 	for my $event (sort keys %{$cal->{$day}}) {
+%	next if ($event !~ /^\d+$/);
+% 	if ($i++ >= 3) {
+	and <% scalar (keys %{$cal->{$day}}) - $i - 1 %> more...
+%		last;
+%	}
+	<a href="/event/show/<% $cal->{$day}->{$event}->{id} %>" title="Show event details">
+	<% $cal->{$day}->{$event}->{headline} %>
+	</a>
+	<br>
+% 	}
+% } else {
+	<% $day %><br>
+	No events.<br>
+% }
+<a href="/event/create/" title="Create new event"><img src="images/plus.png"></a>
+	</td>
+% $j++;
+% }
+</tr>
+</table>

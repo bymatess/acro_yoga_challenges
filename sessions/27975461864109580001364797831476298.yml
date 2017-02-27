@@ -1,0 +1,11 @@
+--- !!perl/hash:Dancer::Session::YAML
+_flash: {}
+id: 27975461864109580001364797831476298
+user:
+  about: "Wooohooo11\r\n444"
+  birth_date: 03. 03. 1983
+  confirmed: 27. 02. 2017
+  email: bymatess6@gmail.com
+  first_name: Martin
+  id: 14
+  last_name: Mares
