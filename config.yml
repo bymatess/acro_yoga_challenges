@@ -19,7 +19,7 @@ charset: "UTF-8"
 # template_toolkit: TT
 
 template: "mason"
-layout: "main.mason"
+layout: "acro.mason"
 #template: "template_toolkit"
 
 # template: "template_toolkit"

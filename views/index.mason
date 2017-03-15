@@ -3,16 +3,34 @@ $settings
 $session
 $request
 $cal => {}
+$newest_photos => [['bird_random', 'Bird', 'L-pose']] #arrayref of arrayrefs 
 </%args>
-<p>Welcome</p>
+			<div class="desktop-12 columns">
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed e
+			<div class="border-top"></div>
+			</div>
+Newest challenges:<br>
+% my $i = 0;
+% for my $record (@{$newest_photos}) {
+% for (my $j=0; $j<20; $j++) {
+%       my ($position_id, $position_name, $category) = @$record;
 
-<br>
-<a href="/login">Login</a><br>
-<a href="/signout">Sign&nbsp;out</a><br>
-<a href="/registration">register</a><br>
-<a href="/confirmation">confirmation (part of reg. process, require: email and confirm_code)</a><br>
-<br>
+				<a href="/position/<% $position_id %>" class="permalink">
+					<div class="desktop-3 mobile-half columns">
+						<div class="item first-row">
+							<h3><% $position_name %></h3>
+							<span class="category"><% $category %></span>
 
-<a href="/user/profile">profile</a><br>
-<a href="/user/profile/edit/">profile edit</a><br>
-<br>
+	<!--						<img src="/position/image/<% $position_id %>" alt="<% $position_name %>" /> --!>
+							<img src="images/bird.jpg" alt="<% $position_name %>" /> 
+						</div><!-- // .item -->
+					</div><!-- // .desktop-3 -->
+				</a>
+% 	if ($i >= 3) {
+%		$i = 0;
+				<div class="clear"></div>
+% 	} else {
+%		$i++;
+%	}
+% }}                                
+			

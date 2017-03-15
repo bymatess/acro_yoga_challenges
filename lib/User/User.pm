@@ -20,7 +20,8 @@ get '/signout' => sub {
 	if (session('user')) {
 		params->{flash_ok} = flash('ok');
 		params->{flash_error} = flash('error');
-		return template("signout", {});
+		return forward("/login", {signout => "1"}, {method => 'POST'});
+		#return template("signout", {});
 	} else {
 		# this never happens, before hook takes over!
 		flash error => "You are not logged in.";
@@ -53,7 +54,7 @@ post '/login' => sub {
 				last_name, email, 
 				date_format(birth_date, '%d. %m. %Y') birth_date, 
 				date_format(confirmed, '%d. %m. %Y') confirmed, 
-				password, confirm_code, about
+				password, confirm_code, about, gender
 				from users
 				where email = ?");
 		$sth->execute(params->{user});
@@ -91,14 +92,14 @@ post '/login' => sub {
 	}
 };
 
-post "/user/change_password/" => sub {
+post "/user_change_password" => sub {
 	my $user = session("user");
 	my $msg;
 	my $salted_password;
 	if (!params->{password} || !params->{password_confirm} || (params->{password} ne params->{password_confirm}) ) {
 		flash('error', "Passwords are not identical.");
-	} elsif (!Meet::Helpers::strong_password(params->{password})) {
-		flash('error', "Passwords is not strong enough.");
+		#} elsif (!Meet::Helpers::strong_password(params->{password})) {
+		#flash('error', "Passwords is not strong enough.");
 	} else {
 		use Digest::SHA;
 		my $password_salt = "matessSoliJakoOZivot";
@@ -111,11 +112,11 @@ post "/user/change_password/" => sub {
 	return template("change_password");
 
 };
-get "/user/change_password/" => sub {
+get "/user_change_password" => sub {
 	return template("change_password");
 };
 
-post "/user/profile/edit/" => sub {
+post "/user_profile_edit" => sub {
 #TODO rewrite to UPDATE database instead of this cheating with deleting and putting all in again
 	database->{AutoCommit} = 0;
 	my $user = session("user");
@@ -142,7 +143,7 @@ post "/user/profile/edit/" => sub {
 		}
 		goto END if (!$ok);
 	}
-	if (defined params->{about} && defined $user->{about} && (params->{about} ne $user->{about}) ) {
+	if (params->{about} && params->{about} ne $user->{about}) {
 		my $sth = database->prepare("update users set about = ? where id = ?");
 		$ok = $sth->execute(params->{about}, $user->{id});
 	} 
@@ -155,15 +156,14 @@ END:
 			$user->{about} = params->{about};
 			session user => $user;
 		}
-		return redirect("/user/profile");
+		return redirect("/user_profile");
 	} else {
 		debug(database->errstr);
 		flash('error', 'There was a problem in saving your application to database, please try it again.');
 		return forward(request->{path_info}, undef, {method => 'GET'});
 	}
 };
-
-get "/user/profile/edit/" => sub {
+get "/user_profile_edit" => sub {
 	my $user = session('user');
 	my $sth_questions = database->prepare("
 		select reg.id, reg.headline, reg.description, reg.options
@@ -210,6 +210,12 @@ get "/user/profile/edit/" => sub {
 	my $photo_id;
 	($photo_id) = $sth_photo->fetchrow_array();
 
+	if (!params->{first_name}) {
+		for my $info (keys %$user) {
+			params->{$info} = $user->{$info};
+		}
+	}
+
 	return template("profile_edit", {
 		questions => $questions_hashref,
 		answers => $answers_hashref,
@@ -228,10 +234,12 @@ get '/user/picture/:user_id/:photo_id' => sub {
 		header 'Content-Type' => 'image/jpeg';
 		return $photo->{photo};
 	} else {
-		
+		my $default_photo = database->quick_select("u_photo", { user_id => 1, id => 15 });
+		header 'Content-Type' => 'image/jpeg';
+		return $default_photo->{photo};
 	}
 };
-post '/user/upload_photo' => sub {
+post '/user_upload_photo' => sub {
 	my $MAX_PHOTO_SIZE = 5000000;
 	my $user = session('user');
 	my $file = request->upload('photo');
@@ -259,9 +267,9 @@ post '/user/upload_photo' => sub {
 		flash ok => "Photo was uploaded.";
 		
 	}
-	return redirect("/user/profile");
+	return redirect("/user_profile");
 };
-get '/user/upload_photo' => sub {
+get '/user_upload_photo' => sub {
 	my $user = session('user');
 	return template("upload_photo");
 };
@@ -269,10 +277,11 @@ get '/user/upload_photo' => sub {
 get '/user/profile/:user_id' => sub {
 		display_profile();
 };
-get '/user/profile/' => sub {
+get '/user_profile' => sub {
 		display_profile();
 };
-get '/user/profile' => sub {
+get '/user' => sub {
+	# RELATIVNI ADRESY V LAYOUTU !!!!!!!!!!!!!!
 		display_profile();
 };
 sub display_profile {
@@ -355,12 +364,12 @@ post '/registration' => sub {
 # redirect to confirmation (temporary)
 	my $error;
 	my $salted_password;
-	if (not defined params->{gender} || !params->{gender}
-		|| (params->{gender} !~ /^[01]$/) ) {
-		if ($error) { $error .= " <br>\n"; }
-		$error .= "Please choose your gender.";	
-	} else {
-	}
+#	if (not defined params->{gender} || !params->{gender}
+#		|| (params->{gender} !~ /^[01]$/) ) {
+#		if ($error) { $error .= " <br>\n"; }
+#		$error .= "Please choose your gender.";	
+#	} else {
+#	}
 	if (!params->{first_name}) {
 		if ($error) { $error .= " <br>\n"; }
 		$error .= "Please fill in your first name.";	
@@ -396,28 +405,26 @@ post '/registration' => sub {
 		}
 
 	}
-	if (!params->{birth_day} || !params->{birth_month} || !params->{birth_year}) {
+	if (!params->{birth_date}) {
 		if ($error) { $error .= " <br>\n"; }
 		$error .= "Please fill in your date of birth.";	
 	} else {
 		my $is_valid;
 		my $date;
-		$date->{day} = params->{birth_day};
-		$date->{month} = params->{birth_month};
-		$date->{year} = params->{birth_year};
+		($date->{year}, $date->{month}, $date->{day}) = split("-", params->{birth_date});
 		$is_valid = Meet::Helpers::is_date($date);
 		if (!$is_valid) {
 			if ($error) { $error .= " <br>\n"; }
-			$error .= "Date of birth is not valid.";	
+			$error .= "Birth date is not valid.";	
 		}
 # check valid date
 	}
 	if (!params->{password} || !params->{password_confirm} || (params->{password} ne params->{password_confirm}) ) {
 		if ($error) { $error .= " <br>\n"; }
 		$error .= "Passwords are not identical.";
-	} elsif (!Meet::Helpers::strong_password(params->{password})) {
-		if ($error) { $error .= " <br>\n"; }
-		$error .= "Password is not strong enough.";
+#	} elsif (!Meet::Helpers::strong_password(params->{password})) {
+#		if ($error) { $error .= " <br>\n"; }
+#		$error .= "Password is not strong enough.";
 	} else {
 		use Digest::SHA;
 		my $password_salt = "matessSoliJakoOZivot";
@@ -433,15 +440,13 @@ post '/registration' => sub {
 				params->{last_name},
 				params->{email},
 				$salted_password,
-				params->{birth_year}."-".params->{birth_month}."-".params->{birth_day},
+				params->{birth_date},
 				$confirmation_code,
 				params->{gender}
 			     );
 		my $text = "Dear ".params->{first_name}." ".params->{last_name}.",\n\n";
 		$text .= "Before you can continue using your account, you need to verify that your e-mail address is valid by clicking the link below:\n";
-		$text .= request->uri_base();
-		$text .= "/confirmation?confirm_code=$confirmation_code;email=";
-		$text .= params->{email}."\n";
+		$text .= request->{env}->{HTTP_HOST}."/confirmation?confirm_code=$confirmation_code;email=".params->{email}."\n";
 
 # TODO send the e-mail
 		#send_mail($sender, params->{email}, "Please confirm your registration at ", $text, {});
