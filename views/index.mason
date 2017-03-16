@@ -2,8 +2,7 @@
 $settings
 $session
 $request
-$cal => {}
-$newest_photos => [['bird_random', 'Bird', 'L-pose']] #arrayref of arrayrefs 
+$newest_photos => [['2', 'Bird', 'L-pose']] #arrayref of arrayrefs 
 </%args>
 			<div class="desktop-12 columns">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed e
@@ -21,8 +20,7 @@ Newest challenges:<br>
 							<h3><% $position_name %></h3>
 							<span class="category"><% $category %></span>
 
-	<!--						<img src="/position/image/<% $position_id %>" alt="<% $position_name %>" /> --!>
-							<img src="images/bird.jpg" alt="<% $position_name %>" /> 
+							<img src="/position/images/<% $position_id %>" class="photo-thumb" alt="<% $position_name %>" /> 
 						</div><!-- // .item -->
 					</div><!-- // .desktop-3 -->
 				</a>

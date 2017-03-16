@@ -5,6 +5,7 @@ $request
 $params => {}
 $title => "Acroyoga Challenges - Acroyogenges"
 $content
+$categories => ()
 </%args>
 
 <!DOCTYPE html>
@@ -75,10 +76,15 @@ $content
 						</a>
 					</li>
 					<li>
-						<a href="/positions">
+						<a href="/category">
 							<span class="count hide-on-mobile">02.</span>
 							Positions
 						</a>
+<ul>
+% foreach my $category (@$categories) {
+						<li><a class=navigation-login href="/category/<% $category->{id} %>"><% $category->{name} %></a> </li>
+% }
+</ul>
 					</li>
 
 					<li>
@@ -113,7 +119,7 @@ $content
 		<div class="logo-wrap">
 			<div class="container">
 				<div class="desktop-6 columns">
-					<h1><a href="index.html" title="Home"><img src="<% $request->{uri_base} %>/images/logo_text_half.png" alt="" /></a></h1>
+					<h1><a href="/" title="Home"><img src="<% $request->{uri_base} %>/images/logo_text_half.png" alt="" /></a></h1>
 				</div><!-- // .desktop-6 -->
 
 				<div class="desktop-6 columns">

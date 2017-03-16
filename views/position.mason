@@ -1,0 +1,84 @@
+<%args>
+$settings
+$session
+$request
+$cal => {}
+$position 
+$photos
+</%args>
+%# use Data::Dumper; print Dumper($position);
+<section id="works" class="page single">
+		<div class="container">
+
+			<div class="desktop-3 tablet-12 nested columns">
+
+				<div class="sidebar sticky">
+
+					<div class="desktop-3 tablet-12 columns">
+					
+						<div class="box-info">
+							<h3 class="border-top"><% $position->{name} %></h3>
+							<p class="project-desc" title="Uploaded"><% $position->{created} %></p>
+
+							<p><% $position->{description} %></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="desktop-3 tablet-6 mobile-half columns">
+
+						<div class="box-info">
+							<h4 class="border-top" title="Category">Category</h4>
+							<p>
+								<% $position->{category_name} %>
+							</p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top">Author</h4>
+							<p title="Link to user's profile"><a href="/user/<% $position->{user_id} %>"><% $position->{user_name} %></a></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="clear"></div>
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top">Number of conquerors</h4>
+							<p title="link to the names?"><a href="conquerors.html">12,563</a></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+					
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top">Actions</h4>
+							<p title="will add it to TODO"><input type="button" name="todo" value="ToDo" style="width: 150px; height: 40px;"/></p>
+							<p title="I made it, add me to the list of fame"><input type="button" name="conquered" value="Conquered" style="width: 150px; height: 40px;"/></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+
+				</div><!-- // .sticky -->
+
+			</div><!-- // .desktop-3 .nested -->
+
+			<div class="desktop-9 tablet-12 columns">
+% for my $id (@{$photos}) {
+
+				<img src="/position/images/<% $id->[0] %>" alt="" />
+% }                                
+
+			</div><!-- // .desktop-9 -->
+
+			<div class="clear"></div>
+
+		</div><!-- // .container -->
+	</section><!-- // section -->
+

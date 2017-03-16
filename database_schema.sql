@@ -28,6 +28,19 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin
 COMMENT = 'Store basic information about users';
 
+CREATE  TABLE IF NOT EXISTS `dance_with_me`.`category` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
+  `description` VARCHAR(512) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_bin
+COMMENT = 'Categories of the poses';
 
 -- -----------------------------------------------------
 -- Table `dance_with_me`.`u_information_reg`

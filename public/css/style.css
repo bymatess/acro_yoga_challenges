@@ -127,8 +127,6 @@ b, strong { font-weight: bold; }
 
 
 
-
-
 /*--------------------------------------------------------------------------
 	3. Pages
 --------------------------------------------------------------------------*/
@@ -215,6 +213,7 @@ b, strong { font-weight: bold; }
 			-o-border-radius: 5px;
 			border-radius: 5px;
 			padding: 30px 40px 26px 40px;
+			margin-bottom: 10px;
 			border-bottom: 4px solid #11ddcc; 
 		}
 
@@ -1776,3 +1775,6 @@ b, strong { font-weight: bold; }
 		}
 
 	}
+
+/* Overwrite */
+.button-color-orange { background: #ee6a22; }

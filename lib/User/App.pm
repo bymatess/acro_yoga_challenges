@@ -39,15 +39,13 @@ sub send_mail {
 
 
 get '/' => sub {
-	my $events;
-	$events = Meet::Helpers::get_events({week => '1'});
-	#print Dumper($events);
-	return template('index', {cal => $events});
+	return template('index', {});
 };
 
 hook 'before_template_render' => sub {
 	my $tokens = shift;
-	$tokens->{specific_scripts} = vars->{specific_scripts} || "";
+	my @categories = database->quick_select('category', { }, {columns => ['id', 'name'], order_by => 'name'});
+	$tokens->{categories} = \@categories;
 };
 
 hook 'after' => sub {
@@ -62,111 +60,88 @@ hook 'after' => sub {
 	}
 };
 
-post "/users" => sub {
-	debug("POST request at ".request->{path_info});
-return redirect("/users");
+get "/position/:position_id" => sub {
+	my $position_id = params->{position_id};
+	my $position_sth = database->prepare("select position.id as position_id,
+position.user_id as user_id,
+position.name as name,
+users.first_name as user_name,
+category.name as category_name,
+category.id as category_id,
+position.created as created,
+position.description as description
+FROM position, users, category 
+WHERE position.id = ? and position.category_id = category.id and position.user_id = users.id");
+        $position_sth->execute($position_id);
+        my $position = $position_sth->fetchrow_hashref();
+
+	my $sth = database->prepare("select id from p_photo where position_id = ?");
+        $sth->execute($position_id);
+        my $photos = $sth->fetchall_arrayref();
+
+	return template('position', {position => $position, photos => $photos});
 };
-get "/users" => sub {
-	my $user = session('user');
-	my $where = "";
-	my $where_exists = ""; # for filters based on user's answer to profile questions
-	my @params;
-	if (defined params->{"send"}) {
-# user wants to filter results...
-# TODO specialni znaky, diakritika
-		if (defined params->{filter_first_name} and params->{filter_first_name}) {
-			if (params->{filter_first_name} =~ /^[a-zA-Z0-9 -]+$/) {
-# TODO length of the name!!!
-				$where .= "AND first_name like CONCAT(?, '%') collate utf8_general_ci ";
-				push @params, params->{filter_first_name};
-			} else {
-				flash("error", "'First name' contains special symbols. Filter is ignored.");
-			}
-		}
-		if (defined params->{filter_last_name} && params->{filter_last_name}) {
-			if (params->{filter_last_name} =~ /^[a-zA-Z0-9 -]+$/) {
-# TODO length of the name!!!
-				$where .= "AND last_name like CONCAT(?, '%') collate utf8_general_ci ";
-				push @params, params->{filter_last_name};
-			} else {
-				flash("error", "'Last name' contains special symbols. Filter is ignored.");
-			} 
-		}
-		if (defined params->{filter_gender}) {
-			if (params->{filter_gender} eq 'male') {
-				$where .= "AND gender = '0' "; 
-			} elsif (params->{filter_gender} eq 'female') {
-				$where .= "AND gender = '1' "; 
-			}
-		}
-		my @checked_questions; # params in format i_INFORMATIONID_ANSWERID
-		@checked_questions = grep {$_ =~ /^i_\d+_\d+$/} params;
-		my $previous_i = "";
-		for my $answer (sort {$a cmp $b } @checked_questions) {
-			my (undef, $i_id, $a_id) = split("_", $answer);
-			if ($previous_i eq $i_id) {
-				$where_exists .= "OR (information_id = ? and answer = ?) ";
-			} else {
-				if ($previous_i) {
-					$where_exists .= ") \n ) \n AND ";
-				}
-				$previous_i = $i_id;
-				$where_exists .= "EXISTS (
-						select 1 
-						from u_information 
-						where user_id = users.id 
-						AND ( (information_id = ? and answer = ?) 
-						";
-			}
-			push @params, $i_id;
-			push @params, $a_id;
-		}
-		if ($where) {
-			$where =~ s/^AND//;
-			$where = "WHERE $where ";
-		}
-		if ($where_exists) {
-			if ($where) {
-				$where_exists = "\n AND $where_exists ";
-			} else {
-				$where_exists = "\n WHERE $where_exists ";
-			}
-			$where_exists = "$where_exists ) ) "; #close braclets
-		}
-	}
-	my $answers;
-	$answers = database->selectall_hashref("
-	select information_id, answ.id answer_id, reg.headline headline,
-	reg.description description, answ.answer
-	from u_information_reg reg, u_information_answers answ
-	where reg.id = answ.information_id
-	and reg.options = 1
-	", "answer_id", {});
-	my $no_filters = "1";
-	# TODO XXX upravit :-)
-	if (0 && !$where && !$where_exists) {
-		$no_filters = 1;
-		return template('user_show_all', { no_filters => $no_filters, answers => $answers});
-	} else {
-	# TODO this is really shitty SQL and will be slow!! 
-		my $sth = database->prepare("
-				select first_name, 
-				last_name, id, birth_date, about,
-				(select max(id) from u_photo where user_id = users.id) photo_id
-				from users
-				" # .$where.$where_exists
-				);
-	#print $where_exists."params: ".Dumper(\@params);
-		$sth->execute(@params);
-		my $users = $sth->fetchall_hashref('id');
-	# default sorting is by last_name, I can add other later
-		my @order = sort {uc($users->{$a}->{last_name}.$users->{$a}->{first_name}) 
-					cmp 
-				uc($users->{$b}->{last_name}.$users->{$b}->{first_name})} keys %{$users};
-		$no_filters = "0";
-		return template('user_show_all', { no_filters => $no_filters, users => $users, order => \@order, answers => $answers });
-	}
-	
+get '/position/images/:photo_id' => sub {
+        my $user = session('user');
+        my $photo_id = params->{photo_id};
+        my $user_id = params->{user_id};
+        my $photo = database->quick_select("p_photo", { id => $photo_id });
+        if ($photo->{id}) {
+                header 'Content-Type' => 'image/jpeg';
+                return $photo->{photo};
+        } else {
+                my $default_photo = database->quick_select("u_photo", { user_id => 1, id => 15 });
+                header 'Content-Type' => 'image/jpeg';
+                return $default_photo->{photo};
+        }
 };
 
-true;
+post '/position/:position_id/upload_photo' => sub {
+        my $MAX_PHOTO_SIZE = 5000000;
+        my $user = session('user');
+        my $file = request->upload('photo');
+        #use Data::Dumper;
+        #print Dumper($file);
+	my $position_id = params->{position_id};
+	my $exists = database->quick_select("position", { id => $position_id });
+	if (!$exists) {
+		flash error => "Position doesn't exist";
+                return template("upload_photo");
+	}
+
+        if ($file->size > $MAX_PHOTO_SIZE) {
+                flash error => "Photo is too big. Max. upload size is 5Mb.";
+                return template("upload_photo");
+        } elsif ($file->headers->{'Content-Type'} !~ /image/i){
+                # TODO more secure checking, not just the header it's stupid and pdf with .jpg will go through;
+                flash error => "A file you are trying to upload is not a picture.";
+                return template("upload_photo");
+        } else {
+                my $photo;
+                my $fh = $file->file_handle;
+                binmode($fh);
+                while (my $part = <$fh>) {
+                        $photo .= $part;
+                }
+                my $sth = database->prepare("insert into p_photo (user_id, photo, position_id) values (?, ?, ?)");
+                $sth->execute($user->{id}, $photo, $position_id); # insert new one
+
+                flash ok => "Photo was uploaded.";
+
+        }
+        return redirect("/position/$position_id");
+};
+get '/position/:position_id/upload_photo' => sub {
+        my $user = session('user');
+	my $position_id = params->{position_id};
+	my $exists = database->quick_select("position", { id => $position_id });
+	if (!$exists) {
+		flash error => "Position doesn't exist";
+                return template("upload_photo");
+	}
+        return template("upload_photo");
+};
+
+
+
+1;
