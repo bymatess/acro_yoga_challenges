@@ -6,6 +6,8 @@ use Dancer::Plugin::FlashMessage;
 use Dancer::Plugin::Database;
 use Template;
 
+use Net::Facebook::Oauth2;
+
 use Data::Dumper;
 our $VERSION = '0.1';
 
@@ -37,15 +39,11 @@ sub send_mail {
 }
 
 
-
-get '/' => sub {
-	return template('index', {});
-};
-
 hook 'before_template_render' => sub {
 	my $tokens = shift;
 	my @categories = database->quick_select('category', { }, {columns => ['id', 'name'], order_by => 'name'});
 	$tokens->{categories} = \@categories;
+	vars->{categories} = \@categories;
 };
 
 hook 'after' => sub {
@@ -60,88 +58,71 @@ hook 'after' => sub {
 	}
 };
 
-get "/position/:position_id" => sub {
-	my $position_id = params->{position_id};
-	my $position_sth = database->prepare("select position.id as position_id,
-position.user_id as user_id,
-position.name as name,
-users.first_name as user_name,
-category.name as category_name,
-category.id as category_id,
-position.created as created,
-position.description as description
-FROM position, users, category 
-WHERE position.id = ? and position.category_id = category.id and position.user_id = users.id");
-        $position_sth->execute($position_id);
-        my $position = $position_sth->fetchrow_hashref();
-
-	my $sth = database->prepare("select id from p_photo where position_id = ?");
-        $sth->execute($position_id);
-        my $photos = $sth->fetchall_arrayref();
-
-	return template('position', {position => $position, photos => $photos});
-};
-get '/position/images/:photo_id' => sub {
-        my $user = session('user');
-        my $photo_id = params->{photo_id};
-        my $user_id = params->{user_id};
-        my $photo = database->quick_select("p_photo", { id => $photo_id });
-        if ($photo->{id}) {
-                header 'Content-Type' => 'image/jpeg';
-                return $photo->{photo};
-        } else {
-                my $default_photo = database->quick_select("u_photo", { user_id => 1, id => 15 });
-                header 'Content-Type' => 'image/jpeg';
-                return $default_photo->{photo};
-        }
+get '/' => sub {
+	return template('index', {});
 };
 
-post '/position/:position_id/upload_photo' => sub {
-        my $MAX_PHOTO_SIZE = 5000000;
-        my $user = session('user');
-        my $file = request->upload('photo');
-        #use Data::Dumper;
-        #print Dumper($file);
-	my $position_id = params->{position_id};
-	my $exists = database->quick_select("position", { id => $position_id });
-	if (!$exists) {
-		flash error => "Position doesn't exist";
-                return template("upload_photo");
+get '/fb_log' => sub {
+	my $fb_token = params->{code};
+	return template('login', {}) if !$fb_token; #move to before hook?
+
+	my $fb = Net::Facebook::Oauth2->new(
+				application_id     => $app_id, 
+				application_secret => $app_secret,
+				callback           => 'http://localhost:3000/fb_log'
+	);
+	my $access_token = $fb->get_access_token(code => $fb_token);
+
+	flash ok => "Login unsuccessful." if !$access_token;
+	return template('login', {}) if !$access_token;
+
+	$fb = Net::Facebook::Oauth2->new(
+			access_token => $access_token
+			);
+	my $fields = join(',', qw/id first_name last_name email gender link locale name timezone/);
+	my $info = $fb->get(
+			'https://graph.facebook.com/v2.8/me?fields='.$fields,   # Facebook API URL
+			);
+	$info = $info->as_hash;
+	$info->{gender} = 0 if $info->{gender} eq 'male';
+	$info->{gender} = 1 if $info->{gender} eq 'female';
+	print STDERR Dumper($info);
+	if (!database->quick_select('users', { fb_id => $info->{id} })) {
+		my $sth = database->prepare("insert into users (first_name, last_name, full_name, email, fb_id, gender, locale, timezone, profile_link, created, last_login) 
+				values (?,?,?,?,?,?,?,?,?, NOW(), NOW())");
+		$sth->execute(
+				$info->{first_name},
+				$info->{last_name},
+				$info->{name},
+				$info->{email},
+				$info->{id},
+				$info->{gender},
+				$info->{locale},
+				$info->{timezone},
+				$info->{profile_link}
+			     );
 	}
+	
+	# create user session
+	session user => $info;
 
-        if ($file->size > $MAX_PHOTO_SIZE) {
-                flash error => "Photo is too big. Max. upload size is 5Mb.";
-                return template("upload_photo");
-        } elsif ($file->headers->{'Content-Type'} !~ /image/i){
-                # TODO more secure checking, not just the header it's stupid and pdf with .jpg will go through;
-                flash error => "A file you are trying to upload is not a picture.";
-                return template("upload_photo");
-        } else {
-                my $photo;
-                my $fh = $file->file_handle;
-                binmode($fh);
-                while (my $part = <$fh>) {
-                        $photo .= $part;
-                }
-                my $sth = database->prepare("insert into p_photo (user_id, photo, position_id) values (?, ?, ?)");
-                $sth->execute($user->{id}, $photo, $position_id); # insert new one
-
-                flash ok => "Photo was uploaded.";
-
-        }
-        return redirect("/position/$position_id");
+	flash ok => "Login successful.";
+	return template('index', {});
 };
-get '/position/:position_id/upload_photo' => sub {
-        my $user = session('user');
-	my $position_id = params->{position_id};
-	my $exists = database->quick_select("position", { id => $position_id });
-	if (!$exists) {
-		flash error => "Position doesn't exist";
-                return template("upload_photo");
-	}
-        return template("upload_photo");
+get '/fb_login' => sub {
+
+	my $fb = Net::Facebook::Oauth2->new(
+			application_id     => $app_id, 
+			application_secret => $app_secret,
+			callback           => 'http://localhost:3000/fb_log'
+			);
+
+	# get the authorization URL for your application
+	my $url = $fb->get_authorization_url(
+			scope   => [ 'public_profile', 'email', 'user_friends' ],
+			display => 'page'
+			);
+	return redirect($url);
 };
-
-
 
 1;

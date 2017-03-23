@@ -14,6 +14,7 @@ Password:
 <input type=password name=pass placeholder="Password" required="required">
 <input type=submit class="button full"value=Login>
 <a href="/registration" class="button full button-color-orange">Registration</a>
+<a href="/fb_login" class="button full fb">Log with Facebook</a>
 <input type=hidden name=path value="<% $request->{path_info} %>" >
 </dl>
 </form>

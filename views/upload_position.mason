@@ -1,0 +1,70 @@
+<%args>
+$settings
+$session
+$request
+$position 
+$categories
+$photos
+</%args>
+%# use Data::Dumper; print Dumper($position);
+<section id="works" class="page single">
+<form action="<% $request->{path_info} %>" method="POST" enctype='multipart/form-data'>
+		<div class="container">
+
+			<div class="desktop-12 tablet-12 columns">
+
+
+					
+						<div class="box-info">
+<p>
+							<h4 class="border-top" title="Name of the acroyoga challenge.">Name</h4>
+							<input type="textfield" name="name" placeholder="Name of the position" id="name" required style="width:100%;"/>
+</p>
+							<p>
+							<h4 class="border-top" title="Description of the acroyoga challenge.">Description</h4>
+							<input type="text" name="description" placeholder="Description" id="description"/>
+							</p>
+							
+							<h4 class="border-top" title="Category of the acroyoga challenge.">Category</h4>
+							<p>
+							<p title="Category of the acroyoga challenge.">
+<select name="category" id="category_select" required>
+	<option value="" selected>Choose a category</option>
+% foreach my $category (@$categories) {
+	<option value="<% $category->{id} %>">
+		<% $category->{name} %>
+	</option>
+% }
+</select>
+							</p>
+							</p>
+							<h4 class="border-top" title="Upload photos">Photos</h4>
+							<p>Upload up to 3 photos in JPG/JPEG/GIF/PNG format under 5MB each. Photos will be compressed and scaled so they will fit to the page.</p>
+% for my $i (qw/1 2 3/) {
+							<p><input type=file name="photo_<% $i %>"></p>
+% }                                
+							<h4 class="border-top" title="Upload photos">Video</h4>
+<p>
+							<p>Sorry guys, not ready yet :-/ <br>You can add a link to youtube which will be embedded as soon as possible and at least displayed until that.</p>
+							<input type="textfield" name="video_link" placeholder="Link to a video" id="video_link" style="width:100%;"/>
+</p>
+						</div><!-- // .box-info -->
+
+						<div class="box-info">
+							<p>
+									<input type="submit" name="save" value="Save" class="button full"/>
+							</p>
+							<p>
+								<a href="/">
+									<input type="button" name="cancel" value="Cancel" class="button full black"/>
+								</a>
+							</p>
+						</div><!-- // .box-info -->
+
+			</div><!-- // .desktop-12 -->
+
+			<div class="clear"></div>
+
+		</div><!-- // .container -->
+	</section><!-- // section -->
+

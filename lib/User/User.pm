@@ -11,9 +11,9 @@ our $VERSION = '0.1';
 our $sender = 'no-reply@localhost';
 
 hook 'before' => sub {
-       if (! session('user') && request->path_info !~ m{^/(login|registration|confirmation|$)}) {
-	   var requested_path => request->path_info;
-	   request->path_info('/login');
+       if (! session('user') && request->path_info !~ m{^/(login|fb_login|registration|confirmation|$)}) {
+#	   var requested_path => request->path_info;
+#	   request->path_info('/login');
        }
 };
 get '/signout' => sub {
@@ -23,7 +23,6 @@ get '/signout' => sub {
 		return forward("/login", {signout => "1"}, {method => 'POST'});
 		#return template("signout", {});
 	} else {
-		# this never happens, before hook takes over!
 		flash error => "You are not logged in.";
 		return template("login", {});
 	}

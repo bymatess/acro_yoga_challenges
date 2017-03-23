@@ -10,23 +10,31 @@ USE `dance_with_me` ;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `dance_with_me`.`users` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `password` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
+  `password` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
   `email` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
-  `first_name` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
-  `last_name` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
-  `birth_date` DATE NOT NULL ,
-  `date` DATETIME NOT NULL ,
+  `first_name` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
+  `last_name` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
+  `birthday` DATE,
+  `date` DATETIME,
   `confirm_code` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
   `confirmed` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
   `about` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
   `gender` TINYINT(1) NOT NULL DEFAULT '0' ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC) )
+  `fb_id` BIGINT NOT NULL,
+  `full_name` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
+  `locale` VARCHAR(32) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
+  `timezone` INT(11),
+  `profile_link` VARCHAR(256) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  `last_login` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+
+  PRIMARY KEY (`id`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 10
+AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin
 COMMENT = 'Store basic information about users';
+
 
 CREATE  TABLE IF NOT EXISTS `dance_with_me`.`category` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
@@ -40,7 +48,39 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin
-COMMENT = 'Categories of the poses';
+COMMENT = 'Categories of the positions';
+
+CREATE  TABLE IF NOT EXISTS `dance_with_me`.`position` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
+  `description` VARCHAR(512) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
+  `user_id` INT(11) NOT NULL ,
+  `category_id` INT(11) NOT NULL ,
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_bin
+COMMENT = 'Positions';
+
+-- -----------------------------------------------------
+-- Table `dance_with_me`.`p_photo`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dance_with_me`.`p_photo` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `user_id` INT(11) NOT NULL ,
+  `photo` LONGBLOB NOT NULL ,
+  `position_id` INT(11) NOT NULL,
+  PRIMARY KEY (`id`) ,
+  INDEX `id_idx` (`id` ASC) )
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_bin
+COMMENT = 'Positions photos' ;
 
 -- -----------------------------------------------------
 -- Table `dance_with_me`.`u_information_reg`

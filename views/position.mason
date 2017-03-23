@@ -28,9 +28,9 @@ $photos
 					<div class="desktop-3 tablet-6 mobile-half columns">
 
 						<div class="box-info">
-							<h4 class="border-top" title="Category">Category</h4>
+							<h4 class="border-top" title="Category of the acroyoga challenge.">Category</h4>
 							<p>
-								<% $position->{category_name} %>
+							<p title="Category of the acroyoga challenge."><a href="category/<% $position->{category_id} %>"><% $position->{category_name} || "No category found" %></a></p>
 							</p>
 						</div><!-- // .box-info -->
 
@@ -39,8 +39,8 @@ $photos
 					<div class="desktop-3 tablet-6 mobile-half columns">
 						
 						<div class="box-info">
-							<h4 class="border-top">Author</h4>
-							<p title="Link to user's profile"><a href="/user/<% $position->{user_id} %>"><% $position->{user_name} %></a></p>
+							<h4 class="border-top" title="Who uploaded this acroyoga position.">Author</h4>
+							<p title="Link to a profile of the user who uploaded this acroyoga challenge."><a href="/user/<% $position->{user_id} %>"><% $position->{user_name} %></a></p>
 						</div><!-- // .box-info -->
 
 					</div><!-- // .desktop-3 -->
@@ -49,8 +49,8 @@ $photos
 					<div class="desktop-3 tablet-6 mobile-half columns">
 						
 						<div class="box-info">
-							<h4 class="border-top">Number of conquerors</h4>
-							<p title="link to the names?"><a href="conquerors.html">12,563</a></p>
+							<h4 class="border-top" title="Number of people who have already learnt this acroyoga position.">Number of conquerors</h4>
+							<p title="Link to names of those who have beaten this acroyoga challenge."><a href="position/<% $position->{position_id} %>/conquerors"><% $position->{conquerors} || "No one found" %></a></p>
 						</div><!-- // .box-info -->
 
 					</div><!-- // .desktop-3 -->
@@ -59,8 +59,16 @@ $photos
 						
 						<div class="box-info">
 							<h4 class="border-top">Actions</h4>
-							<p title="will add it to TODO"><input type="button" name="todo" value="ToDo" style="width: 150px; height: 40px;"/></p>
-							<p title="I made it, add me to the list of fame"><input type="button" name="conquered" value="Conquered" style="width: 150px; height: 40px;"/></p>
+							<p title="Will add the position to your todo list.">
+								<a href="add/<% $position->{position_id} %>">
+									<input type="button" name="todo" value="Challenge me!" class="button full"/>
+								</a>
+							</p>
+							<p title="Click when you mastered this position.">
+								<a href="done/<% $position->{position_id} %>">
+									<input type="button" name="done" value="Conquered" class="button full"/>
+								</a>
+							</p>
 						</div><!-- // .box-info -->
 
 					</div><!-- // .desktop-3 -->
