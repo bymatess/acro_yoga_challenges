@@ -31,7 +31,7 @@ print STDERR Dumper($position);
         $sth->execute($position_id);
         my $photos = $sth->fetchall_arrayref();
 
-	return template('upload_position', {position => $position, photos => $photos});
+	return template('position', {position => $position, photos => $photos});
 };
 
 # Load single photo of position by its ID
