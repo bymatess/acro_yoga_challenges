@@ -2,22 +2,23 @@
 $settings
 $session
 $request
-$positions => [['2', 'Bird', 'L-pose']] #arrayref of arrayrefs 
+$category => {id => "1", name => "L-base", description => "L-base"}
+$positions => [['2', 'Bird', '1']] #arrayref of arrayrefs 
 </%args>
 			<div class="desktop-12 columns">
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed e
+<% $category->{description} %>
 			<div class="border-top"></div>
 			</div>
-Newest challenges:<br>
+Newest challenges in category:<br>
 % my $i = 0;
 % for my $record (@{$positions}) {
-%       my ($position_id, $position_name, $category_name, $photo_id) = @$record;
+%       my ($position_id, $position_name, $photo_id) = @$record;
 
 				<a href="/position/<% $position_id %>" class="permalink">
 					<div class="desktop-3 mobile-half columns">
 						<div class="item first-row">
 							<h3><% $position_name %></h3>
-							<span class="category"><% $category_name %></span>
+% #	<span class="category"><% $category_name %></span>
 
 							<img src="/position/images/<% $photo_id || "default" %>" class="photo-thumb" alt="<% $position_name %>" /> 
 						</div><!-- // .item -->

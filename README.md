@@ -11,6 +11,7 @@ handling of "Conquered" button
 allow to delete position 
 disable "Community" in top menu - or replace with FB link - or develop something for that 
 tweaks of UI
+performance of loading photos
 ----- AFTER DEV -----
 refactoring -- sure, you are going to do that...
 fill in with photos

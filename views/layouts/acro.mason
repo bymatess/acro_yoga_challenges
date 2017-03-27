@@ -127,6 +127,11 @@ $categories => ()
 						byMatess &amp; Brno Acro group<br />
 						<span class="font-color-primary">For the fun of learning</span>
 					</p><!-- // .site-desc -->
+						<p class="header-links" title="Upload a new acroyoga challenge.">
+                                                                <a href="/upload_position">
+                                                                        <input type="button" name="upload_position" value="Upload a new challenge" class="button smaller black"/>
+                                                                </a>
+                                                </p>
 				</div><!-- // .desktop-6 -->
 
 				<div class="clear"></div>

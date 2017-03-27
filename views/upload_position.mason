@@ -2,9 +2,7 @@
 $settings
 $session
 $request
-$position 
 $categories
-$photos
 </%args>
 %# use Data::Dumper; print Dumper($position);
 <section id="works" class="page single">

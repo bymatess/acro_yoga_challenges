@@ -59,7 +59,20 @@ hook 'after' => sub {
 };
 
 get '/' => sub {
-	return template('index', {});
+	my $positions_sth = database->prepare("
+SELECT position.id AS position_id,
+position.name AS position_name, 
+category.name AS category_name,
+(select id from p_photo where position_id = position.id LIMIT 1) AS photo_id
+FROM position, category
+WHERE position.category_id = category.id
+ORDER BY position.id DESC
+LIMIT 12
+");
+	$positions_sth->execute();
+        my $positions = $positions_sth->fetchall_arrayref();
+print STDERR Dumper($positions);
+	return template('index', {positions => $positions});
 };
 
 get '/fb_log' => sub {
@@ -104,7 +117,7 @@ get '/fb_log' => sub {
 	}
 	
 	# create user session
-	session user => $info;
+	session user => database->quick_select('users', { fb_id => $info->{id} }); 
 
 	flash ok => "Login successful.";
 	return template('index', {});

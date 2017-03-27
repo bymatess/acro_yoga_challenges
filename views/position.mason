@@ -82,6 +82,10 @@ $photos
 
 				<img src="/position/images/<% $id->[0] %>" alt="" />
 % }                                
+% if ($position->{video_link}) {
+	Video probably not working yet :-( I will fix it later...<br/>
+	<iframe width="400" height="300" src="<% $position->{video_link} %>"></iframe>
+% }
 
 			</div><!-- // .desktop-9 -->
 
