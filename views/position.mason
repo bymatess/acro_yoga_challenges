@@ -59,18 +59,41 @@ $photos
 						
 						<div class="box-info">
 							<h4 class="border-top">Actions</h4>
-							<p title="Will add the position to your todo list.">
-								<a href="add/<% $position->{position_id} %>">
-									<input type="button" name="todo" value="Challenge me!" class="button full"/>
-								</a>
+							<p title="Will add the position to your todo list." id="todo_button" onClick="challenge_accepted();">
+									<input type="button" name="todo" id="todo" value="Challenge me!" class="button full"/>
 							</p>
-							<p title="Click when you mastered this position.">
-								<a href="done/<% $position->{position_id} %>">
-									<input type="button" name="done" value="Conquered" class="button full"/>
-								</a>
+							<p title="Click when you mastered this position." id="done_button" onClick="challenge_completed();">
+									<input type="button" name="done" id="done" value="Conquered" class="button full"/>
 							</p>
 						</div><!-- // .box-info -->
 
+     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+		    function challenge_accepted() {
+				    jQuery.get('<% $request->{path_info} %>/todo' , function(data) {
+							var element;
+							if (data["type"] == "error") {
+								element = "#flash_error";
+							} else {
+								element = "#flash_ok";
+							}
+						    	$(element).html(data["text"]);
+						    });
+				    return false;
+				    }
+		    function challenge_completed() {
+				    jQuery.get('<% $request->{path_info} %>/done' , function(data) {
+							var element;
+							if (data["type"] == "error") {
+								element = "#flash_error";
+							} else {
+								element = "#flash_ok";
+							}
+						    	$(element).html(data["text"]);
+						    });
+				    return false;
+				    }
+    </script>
 					</div><!-- // .desktop-3 -->
 
 				</div><!-- // .sticky -->

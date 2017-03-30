@@ -6,9 +6,9 @@ CREATE SCHEMA IF NOT EXISTS `dance_with_me` DEFAULT CHARACTER SET utf8 ;
 USE `dance_with_me` ;
 
 -- -----------------------------------------------------
--- Table `dance_with_me`.`users`
+-- Table `dance_with_me`.`user`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `dance_with_me`.`users` (
+CREATE  TABLE IF NOT EXISTS `dance_with_me`.`user` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
   `password` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin',
   `email` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
@@ -67,6 +67,35 @@ COLLATE = utf8_bin
 COMMENT = 'Positions';
 
 -- -----------------------------------------------------
+-- Table `dance_with_me`.`accepted_challenge`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `dance_with_me`.`accepted_challenge` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `user_id` INT(11) NOT NULL ,
+  `position_id` INT(11) NOT NULL ,
+  `accepted` TIMESTAMP,
+  `completed` TIMESTAMP,
+  `deleted` TIMESTAMP,
+  PRIMARY KEY (`id`) ,
+  INDEX `id_idx` (`user_id` ASC) ,
+  INDEX `fk_u_posiiton_1_idx` (`position_id` ASC) ,
+  CONSTRAINT `fk_u_user_1`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `dance_with_me`.`user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_u_position_2`
+    FOREIGN KEY (`position_id` )
+    REFERENCES `dance_with_me`.`position` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_bin
+COMMENT = 'matrix for user - position';
+
+-- -----------------------------------------------------
 -- Table `dance_with_me`.`p_photo`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `dance_with_me`.`p_photo` (
@@ -115,7 +144,7 @@ CREATE  TABLE IF NOT EXISTS `dance_with_me`.`u_information` (
   INDEX `fk_u_information_1_idx` (`information_id` ASC) ,
   CONSTRAINT `fk_u_information_1`
     FOREIGN KEY (`user_id` )
-    REFERENCES `dance_with_me`.`users` (`id` )
+    REFERENCES `dance_with_me`.`user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_u_information_2`
@@ -164,7 +193,7 @@ CREATE  TABLE IF NOT EXISTS `dance_with_me`.`u_photo` (
   INDEX `id_idx` (`user_id` ASC) ,
   CONSTRAINT `a_3`
     FOREIGN KEY (`user_id` )
-    REFERENCES `dance_with_me`.`users` (`id` )
+    REFERENCES `dance_with_me`.`user` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

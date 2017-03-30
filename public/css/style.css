@@ -1347,6 +1347,18 @@ b, strong { font-weight: bold; }
 
 
 
+	.contact-warning {
+			color: white;
+			background: #ee3a22;
+			padding: 20px 25px;
+			margin-bottom: 30px;
+	}
+	.contact-success {
+			color: #22eedd;
+			background: #111;
+			padding: 20px 25px;
+			margin-bottom: 30px;
+	}
 
 	/*---------------------------------------------------
 			3.8 Contact

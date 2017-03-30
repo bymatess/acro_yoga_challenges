@@ -11,6 +11,71 @@ use Net::Facebook::Oauth2;
 use Data::Dumper;
 our $VERSION = '0.1';
 
+
+get "/test" => sub {
+	return template('test');
+};
+get "/position/:position_id/todo" => sub {
+    header 'Content-Type' => 'application/json';
+	my $position_id = params->{position_id};
+	my $user = session("user");
+	my $exists = database->quick_select("position", { id => $position_id });
+        return to_json { type => "error", text => "Position doesn't exist"} if (!$exists);
+
+	my $todo_exists = database->quick_select("accepted_challenge", { position_id => $position_id, user_id => $user->{id} });
+	if ($todo_exists) {
+		if ($todo_exists->{accepted}) {
+    			return to_json { type => 'ok', text => "Challenge already accepted." };
+		}
+		if ($todo_exists->{completed}) {
+    			return to_json { type => 'ok', text => "Challenge already conquered." };
+		}
+	} else {
+		my $sth = database->prepare("insert into accepted_challenge (user_id, position_id, accepted) values (?, ?, NOW())");
+                $sth->execute($user->{id}, $position_id); # insert new one
+    		return to_json { type => 'ok', text => "You accepted the challenge. Good luck :-)" };
+	}
+	
+	
+
+    return to_json { type => 'error', text => "TODO position '$position_id'" };
+};
+
+get "/position/:position_id/done" => sub {
+    header 'Content-Type' => 'application/json';
+	my $position_id = params->{position_id};
+	my $user = session("user");
+	my $exists = database->quick_select("position", { id => $position_id });
+        return to_json { type => "error", text => "Position doesn't exist"} if (!$exists);
+
+	my $todo_exists = database->quick_select("accepted_challenge", { position_id => $position_id, user_id => $user->{id} });
+	if ($todo_exists) {
+		if ($todo_exists->{completed}) {
+    			return to_json { type => 'ok', text => "Challenge already conquered." };
+		} else {
+			my $accepted = "";
+			$accepted = ", accepted = NOW()";
+			my $sth = database->prepare("update accepted_challenge set completed = NOW() $accepted where user_id = ? and position_id = ?");
+			$sth->execute($user->{id}, $position_id); 
+			return to_json { type => 'ok', text => "You conquered the challenge. Good job :-)" };
+		}
+	} else {
+		my $sth = database->prepare("insert into accepted_challenge (user_id, position_id, accepted, completed) values (?, ?, NOW(), NOW())");
+                $sth->execute($user->{id}, $position_id); # insert new one
+    		return to_json { type => 'ok', text => "You conquered the challenge. Good job :-)" };
+	}
+	
+	
+
+    return to_json { type => 'error', text => "TODO position '$position_id'" };
+};
+
+
+
+
+
+
+
 sub send_mail {
 	my ($from, $to, $subject, $text, $params) = @_;
 	if (!$to) {

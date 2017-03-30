@@ -78,7 +78,7 @@ $categories => ()
 					<li>
 						<a href="/category">
 							<span class="count hide-on-mobile">02.</span>
-							Positions
+							Categories
 						</a>
 <ul>
 % foreach my $category (@$categories) {
@@ -88,7 +88,7 @@ $categories => ()
 					</li>
 
 					<li>
-						<a href="/community">
+						<a href="https://www.facebook.com/Acroyogenges-Acroyoga-challenges-389888338059127/" target="_blank">
 							<span class="count hide-on-mobile">03.</span>Community
 						</a>
 					</li>
@@ -144,10 +144,10 @@ $categories => ()
 	================================================== -->
 	<section id="works">
 		<div class="container">
-				<div class=ok>
+				<div class="contact-success" id="flash_ok">
 % print Dancer::Plugin::FlashMessage::flash('ok')||'';
 	                        </div>
-        	                <div class=error>
+        	                <div class="contact-warning" id="flash_error">
 % print Dancer::Plugin::FlashMessage::flash('error')||'';
 	                        </div>
 <% $content %>
