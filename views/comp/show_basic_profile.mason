@@ -6,49 +6,55 @@ $photo_id => "1" #default avatar id in db
 $edit => "0"
 </%args>
 <!-- links --!>
-% if ($session->{'user'}->{id} eq $basic_info->{id}) {
-<div class="profile-links">
-% if (!$edit) {
-<a href="/user/profile/edit/">Edit</a>
-% }
-<a href="/user/upload_photo">Change&nbsp;photo</a>
-<a href="/user/change_password/">Change&nbsp;password</a>
-</div>
-% }
-<!-- basic information --!>
-<div class="profile-pic">
-<a href="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>">
-<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>" width="100" height="150">
-</a>
-</div>
-<div class="profile-basic">
-<h1 class="profile-basic-h1"><% $basic_info->{first_name} %> <% $basic_info->{last_name} %> </h1>
-<table class="profile-basic-table">
-<tr>
-<td>Birth day:</td>
-<td><% $basic_info->{birth_date} %></td>
-</tr>
-<tr>
-<td>E-mail:</td>
-<td><% $basic_info->{email} %></td>
-</tr>
-<tr>
-<td>Member since:</td>
-<td><% $basic_info->{confirmed} %></td>
-</tr>
-<tr>
-<td>About:</td>
-<td>
-% if ($edit) {
-<textarea name=about cols="12" rows=""><% $basic_info->{about} %></textarea>
-% } else {
-<% $basic_info->{about} %>
-% }
-</td>
-</tr>
-</table>
-</div>
+<section id="works" class="page single">
+		<div class="container">
 
-<div class=clear></div>
-<!-- end basic information --!>
+			<div class="desktop-3 tablet-12 nested columns">
+
+				<div class="sidebar">
+
+					<div class="desktop-3 tablet-12 columns">
+					
+						<div class="box-info">
+							<h3 class="border-top"><% $basic_info->{first_name} %> <% $basic_info->{last_name} %></h3>
+							<p class="project-desc" title="Profile created "><% $basic_info->{created} %></p>
+
+						</div><!-- // .box-info -->
+% # <td><% $basic_info->{email} %></td>
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top" title="Basic information from the user">About</h4>
+							<p><% $basic_info->{about} || "<i>No description</i>" %></a></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+					
+					 <div class="desktop-3 tablet-6 mobile-half columns">
+                                                <div class="box-info">
+                                                        <h4 class="border-top">Actions</h4>
+% if ($session->{'user'}->{id} eq $basic_info->{id}) {
+<p><a href="/user/profile/edit"><input type="button" class="button full" value="Edit"/></a></p>
+<p><a href="/user/upload_photo"><input type="button" class="button full" value="Change&nbsp;photo"/></a></p>
+% if (!$basic_info->{fb_id}) {
+<p><a href="/user/change_password"><input type="button" class="button full" value="Change&nbsp;password"/></a></p>
+% }
+% }
+                                                </div><!-- // .box-info -->
+					</div><!-- // .desktop-3 -->
+					
+					<div class="clear"></div>
+				</div><!-- // .sticky -->
+
+			</div><!-- // .desktop-3 .nested -->
+			<div class="desktop-9 tablet-12 columns">
+% #	<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>">
+	<img src="/position/images/1">
+			</div> <!-- // desktop-9 -->
+
+		</div><!-- // .container -->
+</section><!-- // section -->
 

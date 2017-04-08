@@ -11,10 +11,10 @@ our $VERSION = '0.1';
 our $sender = 'no-reply@localhost';
 
 hook 'before' => sub {
-       if (! session('user') && request->path_info !~ m{^/(login|fb_login|registration|confirmation|$)}) {
+#       if (! session('user') && request->path_info !~ m{^/(login|fb_login|registration|confirmation|$)}) {
 #	   var requested_path => request->path_info;
 #	   request->path_info('/login');
-       }
+#       }
 };
 get '/signout' => sub {
 	if (session('user')) {
@@ -27,6 +27,7 @@ get '/signout' => sub {
 		return template("login", {});
 	}
 };
+
 get '/login' => sub {
 # Display a login page; the original URL they requested is available as
 # vars->{requested_path}, so could be put in a hidden field in the form
@@ -91,7 +92,7 @@ post '/login' => sub {
 	}
 };
 
-post "/user_change_password" => sub {
+post "/user/change_password" => sub {
 	my $user = session("user");
 	my $msg;
 	my $salted_password;
@@ -111,42 +112,24 @@ post "/user_change_password" => sub {
 	return template("change_password");
 
 };
-get "/user_change_password" => sub {
+get "/user/change_password" => sub {
 	return template("change_password");
 };
 
-post "/user_profile_edit" => sub {
-#TODO rewrite to UPDATE database instead of this cheating with deleting and putting all in again
+post "/user/profile/edit" => sub {
 	database->{AutoCommit} = 0;
 	my $user = session("user");
-	my $sth_answers = database->prepare("
-		delete 
-		from u_information
-		where user_id = ? 
-	");
-	$sth_answers->execute($user->{id});
+
 	my $ok = 1;
-	for my $question (grep(/^question_\d+$/,params)) {
-		my (undef, $question_id) = split("_", $question);
-		my $sth = database->prepare("insert into u_information (user_id, information_id, answer, date, author) values (?, ?, ?, NOW(), ?) ");
-		my $answers = params->{$question};
-		if ($answers =~ /^ARRAY/) {
-			for my $answer (@$answers) {
-				next if !$answer;
-				$ok = $sth->execute($user->{id}, $question_id, $answer, $user->{id});
-				goto END if (!$ok);
-			}
-		} else {
-				next if !$answers;
-				$ok = $sth->execute($user->{id}, $question_id, $answers, $user->{id});
+	my $about = params->{about};
+	if (defined $about && $about ne $user->{about}) {
+		if (length($about) >= 127) {
+			flash('error', "'About' text is too long (limit is approx. 127 characters).");
+			return redirect("/user/profile/edit");
 		}
-		goto END if (!$ok);
-	}
-	if (params->{about} && params->{about} ne $user->{about}) {
 		my $sth = database->prepare("update users set about = ? where id = ?");
 		$ok = $sth->execute(params->{about}, $user->{id});
 	} 
-END:
 	my $result = ($ok ? database->commit : database->rollback );
 	if ($ok && $result) {
 		flash('ok', "Saved.");
@@ -155,73 +138,15 @@ END:
 			$user->{about} = params->{about};
 			session user => $user;
 		}
-		return redirect("/user_profile");
+		return redirect("/user/profile");
 	} else {
 		debug(database->errstr);
 		flash('error', 'There was a problem in saving your application to database, please try it again.');
 		return forward(request->{path_info}, undef, {method => 'GET'});
 	}
 };
-get "/user_profile_edit" => sub {
-	my $user = session('user');
-	my $sth_questions = database->prepare("
-		select reg.id, reg.headline, reg.description, reg.options
-		from u_information_reg reg
-		");
-	$sth_questions->execute();
-	my $questions_hashref = $sth_questions->fetchall_hashref("id");
-
-	my $sth_answers = database->prepare("
-		select id, information_id, answer 
-		from u_information_answers
-		order by information_id, answer, id
-		");
-	$sth_answers->execute();
-	my $answers_ref = $sth_answers->fetchall_arrayref();
-	my $answers_hashref;
-	for my $record (@$answers_ref) {
-		my ($a_id, $a_information_id, $answer) = @$record;
-		$answers_hashref->{$a_information_id}->{$a_id} = $answer;
-	}
-
-	my $sth_users_answers = database->prepare("
-		select information_id, answer
-		from u_information
-		where user_id = ?
-	");
-	$sth_users_answers->execute($user->{id});
-	my $users_answers_ref = $sth_users_answers->fetchall_arrayref();
-	my $users_answers_hashref;
-	for my $record (@$users_answers_ref) {
-		my ($information_id, $answer) = @$record;
-		if ($questions_hashref->{$information_id}->{options}) {
-			$users_answers_hashref->{$information_id}->{$answer} = 1;
-		} else {
-			$users_answers_hashref->{$information_id} = $answer;
-		}
-	}
-	# photo
-	my $sth_photo = database->prepare("select max(id) 
-			from u_photo
-			where user_id = ?
-			-- and profile_pic = 1");
-	$sth_photo->execute($user->{id});
-	my $photo_id;
-	($photo_id) = $sth_photo->fetchrow_array();
-
-	if (!params->{first_name}) {
-		for my $info (keys %$user) {
-			params->{$info} = $user->{$info};
-		}
-	}
-
-	return template("profile_edit", {
-		questions => $questions_hashref,
-		answers => $answers_hashref,
-		users_answers => $users_answers_hashref,
-		photo_id => $photo_id,
-	});
-
+get "/user/profile/edit" => sub {
+	display_profile("edit");
 };
 
 get '/user/picture/:user_id/:photo_id' => sub {
@@ -238,12 +163,16 @@ get '/user/picture/:user_id/:photo_id' => sub {
 		return $default_photo->{photo};
 	}
 };
-post '/user_upload_photo' => sub {
+post '/user/upload_photo' => sub {
 	my $MAX_PHOTO_SIZE = 5000000;
 	my $user = session('user');
 	my $file = request->upload('photo');
 	#use Data::Dumper;
 	#print Dumper($file);
+	if (!$file) {
+		flash error => "No photo selected.";
+		return template("upload_photo");
+	}
 	if ($file->size > $MAX_PHOTO_SIZE) {
 		flash error => "Photo is too big. Max. upload size is 5Mb.";
 		return template("upload_photo");
@@ -266,9 +195,9 @@ post '/user_upload_photo' => sub {
 		flash ok => "Photo was uploaded.";
 		
 	}
-	return redirect("/user_profile");
+	return redirect("/user/profile");
 };
-get '/user_upload_photo' => sub {
+get '/user/upload_photo' => sub {
 	my $user = session('user');
 	return template("upload_photo");
 };
@@ -276,25 +205,23 @@ get '/user_upload_photo' => sub {
 get '/user/profile/:user_id' => sub {
 		display_profile();
 };
-get '/user_profile' => sub {
+get '/user/profile' => sub {
 		display_profile();
 };
 get '/user' => sub {
-	# RELATIVNI ADRESY V LAYOUTU !!!!!!!!!!!!!!
 		display_profile();
 };
+
 sub display_profile {
+	my $edit = shift;
 	my $user = session('user');
 	my $display_user_id = params->{user_id};
 	if (!$display_user_id) {
 		$display_user_id = $user->{id};
 	}
 	my $choosen_user = database->selectrow_hashref("
-	select id, first_name, last_name,
-	about, email,
-	date_format(birth_date, '%d. %m. %Y') birth_date, 
-	date_format(confirmed, '%d. %m. %Y') confirmed, 
-	about
+	select id, first_name, last_name, fb_id, created, 
+	about, email
 	from users
 	where id = ?
 	", {}, $display_user_id);
@@ -302,15 +229,16 @@ sub display_profile {
 		flash('error',"User doesn't exist.");
 		return template("index");
 	} else {
-		delete $choosen_user->{password};
-		delete $choosen_user->{confirm_code};
 		if ($choosen_user->{hide_email}) {
 			# TODO private setting, probably new table in db
 			$choosen_user->{email} = "Contact is hidden.";
 		}
 		$user = $choosen_user;
 	}
-
+	if ($edit && $user->{id} ne session('user')->{id}) {
+		flash('error',"You don't have permission for this action.");
+                return template("index");
+	}
 	my $information_arrayref;
 	my $sth = database->prepare("
 		select reg.headline, reg.description, 
@@ -333,7 +261,10 @@ sub display_profile {
 	$sth_photo->execute($display_user_id);
 	my $photo_id;
 	($photo_id) = $sth_photo->fetchrow_array();
-	return template("profile", {
+
+	my $page =  "profile";
+	$page = "profile_edit" if ($edit);
+	return template($page, {
 			basic_info => $user,
 			photo_id => $photo_id,
 			information => $information_arrayref

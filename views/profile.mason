@@ -1,43 +1,61 @@
 <!-- Here define your next vars --!>
 <%args>
-$settings
 $session
-$request
-$params => {}
 $basic_info
-$information #ref to array of records $information[0] = ($headline, $description, $answer)
 $photo_id => "1" #default avatar id in db
+$edit => "0"
+$request
 </%args>
-%# use Data::Dumper; print Dumper($session);
+<!-- links --!>
+<section id="works" class="page single">
+		<div class="container">
 
-<& comp/show_basic_profile.mason, photo_id => $photo_id, basic_info => $basic_info, session => $session &>
+			<div class="desktop-3 tablet-12 nested columns">
 
-<!-- For questions from u_i_r --!>
-% my $previous_question;
-% for my $record (@{$information}) {
-%	my ($headline, $description, $answer) = @$record;
-%	if ($previous_question && $headline eq $previous_question) {
-%	# more answers to one question - continuing in one div
-		<br>
-		<% $answer %>
-%	} else { # first (new) question, open div (close the previous)
-%		if ($previous_question) { # closing div class="profile-question-body"
-			</div>
-%		}
-		<div class="profile-question-head">
-		<h3 class="profile-question-h3"><% $headline %></h3>
-		</div>
-		<p class="small-note"><% $description %></p>
-		<div class="profile-question-body">
-			<% $answer %>
-%	}
-%	$previous_question = $headline;	
+				<div class="sidebar">
+
+					<div class="desktop-3 tablet-12 columns">
+					
+						<div class="box-info">
+							<h3 class="border-top"><% $basic_info->{first_name} %> <% $basic_info->{last_name} %></h3>
+							<p class="project-desc" title="Profile created "><% $basic_info->{created} %></p>
+
+						</div><!-- // .box-info -->
+% # <td><% $basic_info->{email} %></td>
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top" title="Basic information from the user">About</h4>
+							<p><% $basic_info->{about} || "<i>No description</i>" %></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+					
+					 <div class="desktop-3 tablet-6 mobile-half columns">
+                                                <div class="box-info">
+                                                        <h4 class="border-top">Actions</h4>
+% if ($session->{'user'}->{id} eq $basic_info->{id}) {
+<p><a href="/user/profile/edit"><input type="button" class="button full" value="Edit"/></a></p>
+<p><a href="/user/upload_photo"><input type="button" class="button full" value="Change&nbsp;photo"/></a></p>
+% if (!$basic_info->{fb_id}) {
+<p><a href="/user/change_password"><input type="button" class="button full" value="Change&nbsp;password"/></a></p>
 % }
-% if (scalar @{$information}) {
-	</div>
-% } else {
-	<div><b>User didn't provide any more information</b></div>
 % }
-<!-- end questions from u_i_r --!>
+                                                </div><!-- // .box-info -->
+					</div><!-- // .desktop-3 -->
+					
+					<div class="clear"></div>
+				</div><!-- // .sticky -->
 
+			</div><!-- // .desktop-3 .nested -->
+			<div class="desktop-9 tablet-12 columns">
+% #	<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>">
+	<img src="/position/images/1">
+			</div> <!-- // desktop-9 -->
+
+		</div><!-- // .container -->
+</section><!-- // section -->
 

@@ -144,12 +144,11 @@ $categories => ()
 	================================================== -->
 	<section id="works">
 		<div class="container">
-				<div class="contact-success" id="flash_ok">
-% print Dancer::Plugin::FlashMessage::flash('ok')||'';
-	                        </div>
-        	                <div class="contact-warning" id="flash_error">
-% print Dancer::Plugin::FlashMessage::flash('error')||'';
-	                        </div>
+% my $flash_ok = Dancer::Plugin::FlashMessage::flash('ok') || '';
+% print "<div class=\"contact-success\" id=\"flash_ok\">$flash_ok</div>";
+% my $flash_error = Dancer::Plugin::FlashMessage::flash('error') || '';
+% print "<div class=\"contact-warning\" id=\"flash_error\">$flash_error</div>";
+
 <% $content %>
 		</div><!-- // .container -->
 	</section><!-- // section#works -->

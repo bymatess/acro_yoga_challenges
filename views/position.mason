@@ -12,7 +12,7 @@ $photos
 
 			<div class="desktop-3 tablet-12 nested columns">
 
-				<div class="sidebar sticky">
+				<div class="sidebar">
 
 					<div class="desktop-3 tablet-12 columns">
 					
@@ -30,7 +30,7 @@ $photos
 						<div class="box-info">
 							<h4 class="border-top" title="Category of the acroyoga challenge.">Category</h4>
 							<p>
-							<p title="Category of the acroyoga challenge."><a href="category/<% $position->{category_id} %>"><% $position->{category_name} || "No category found" %></a></p>
+							<p title="Category of the acroyoga challenge."><a href="/category/<% $position->{category_id} %>"><% $position->{category_name} || "No category found" %></a></p>
 							</p>
 						</div><!-- // .box-info -->
 
@@ -50,7 +50,7 @@ $photos
 						
 						<div class="box-info">
 							<h4 class="border-top" title="Number of people who have already learnt this acroyoga position.">Number of conquerors</h4>
-							<p title="Link to names of those who have beaten this acroyoga challenge."><a href="position/<% $position->{position_id} %>/conquerors"><% $position->{conquerors} || "No one found" %></a></p>
+							<p title="Link to names of those who have beaten this acroyoga challenge."><a href="/position/<% $position->{position_id} %>/conquerors"><% $position->{conquerors} || "No one found" %></a></p>
 						</div><!-- // .box-info -->
 
 					</div><!-- // .desktop-3 -->

@@ -1,48 +1,63 @@
 <!-- Here define your next vars --!>
 <%args>
-$settings
 $session
+$basic_info
+$photo_id => "1" #default avatar id in db
+$edit => "0"
 $request
-$params => {}
-$vars => {}
-$questions => {} #hashref with questions
-$answers => {} #hashref with answers to choose from
-$users_answers => {} #user's previous answers to questions
-$photo_id => "1"
 </%args>
-%# if you want to know what's inside those vars delete the following '#'
-%# use Data::Dumper;
-%# print Dumper($questions)."<br>";
-%# print Dumper($answers)."<br>";
-%# print Dumper($users_answers);
+<!-- links --!>
 
-<form action="<% $request->{path_info} %>" method=post>
-<!-- basic information - not editable except "about"--!>
-<& comp/show_basic_profile.mason, photo_id => $photo_id, basic_info => $session->{user}, session => $session, edit => 1 &>
-<!-- end basic information --!>
+<section id="works" class="page single">
+		<div class="container">
 
-% for my $question_id (sort keys %$questions) {
-                <b><% $questions->{$question_id}->{headline} %></b>
-		<br>
-		<% $questions->{$question_id}->{description} %> 
-		<br>
-%                if ($questions->{$question_id}->{options}) {
-%                        # must go through answers and chech those user already filled in
-                <select name=question_<% $question_id %> multiple='multiple'>
-%                        for my $answer_id (sort keys %{$answers->{$question_id}}) {
-%                                my $selected = "";
-%                                if ($users_answers->{$question_id}->{$answer_id}) {
-%                                        $selected = "selected='selected'";
-%                                }
-<option value=<% $answer_id %> <% $selected %> ><% $answers->{$question_id}->{$answer_id} %></option>
-%                        }
-                        </select><br>
-%                } else {
-%                        # just write user's answer to a textfield
-                                <textarea name=question_<% $question_id %> ><% $users_answers->{$question_id} %></textarea><br>
-%               }
-%        }
-<br>
-<input type=submit name=profile_edit value='Save'>
+			<div class="desktop-3 tablet-12 nested columns">
+<form action="/user/profile/edit" method="POST">
+				<div class="sidebar">
+
+					<div class="desktop-3 tablet-12 columns">
+					
+						<div class="box-info">
+							<h3 class="border-top"><% $basic_info->{first_name} %> <% $basic_info->{last_name} %></h3>
+% if (!$basic_info->{fb_id}) {
+							<h4 class="border-top">First Name</h4>
+<p><input type="textarea" name=first_name" value="<% $basic_info->{first_name} %>"></p>
+							<h4 class="border-top">Last Name</h4>
+<p><input type="textarea" name=last_name" value="<% $basic_info->{last_name} %>"></p>
+							<h4 class="border-top" title="This won't be visible to other users">Email</h4>
+<p><input type="textarea" name="email" value="<% $basic_info->{email} %>"></p>
+% }
+							<p class="project-desc" title="Profile created "><% $basic_info->{created} %></p>
+
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+
+					<div class="desktop-3 tablet-6 mobile-half columns">
+						
+						<div class="box-info">
+							<h4 class="border-top" title="Basic information from the user">About</h4><!-- test -->
+							<p><input type="text" name="about" value="<% $basic_info->{about} %>"></p>
+						</div><!-- // .box-info -->
+
+					</div><!-- // .desktop-3 -->
+					
+					 <div class="desktop-3 tablet-6 mobile-half columns">
+                                                <div class="box-info">
+                                                        <h4 class="border-top">Actions</h4>
+                                                </div><!-- // .box-info -->
+					</div><!-- // .desktop-3 -->
+					
+					<div class="clear"></div>
+				</div><!-- // sidebar -->
+<input type="submit" class="button full" value="Save"/>
 </form>
+			</div><!-- // .desktop-3 .nested -->
+			<div class="desktop-9 tablet-12 columns">
+% #	<img src="/user/picture/<% $basic_info->{id} %>/<% $photo_id %>">
+	<img src="/position/images/1">
+			</div> <!-- // desktop-9 -->
+
+		</div><!-- // .container -->
+</section><!-- // section -->
 

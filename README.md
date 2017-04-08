@@ -8,21 +8,28 @@ list of my challenges
 allow to delete position 
 number of conquerors -- select and send it to the template
 tweaks of UI
-	-- error/ok flash divs 
-	-- 
+	-- list of positions - portrait vs landscape pics
 !!!performance of loading photos
+
 ----- AFTER DEV -----
 refactoring -- sure, you are going to do that...
+refactor MYSQL -- longer description, about...
 refactor position.mason -- jquery functions...
-fill in with photos
+fill in with default photos
 create some categories
 proof-read/translation
+
 ----- IDEAS -----
 rename position to challenge
 geolocation of users
 
+
+
 ----------------------------------------
 Done:
+display my profile and edit + upload user photo
+tweaks of UI
+	-- error/ok flash divs 
 handling of "Challenge me" button
 handling of "Conquered" button
 disable "Community" in top menu - or replace with FB link - or develop something for that 
