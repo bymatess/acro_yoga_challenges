@@ -4,6 +4,7 @@ use warnings;
 use Dancer ':syntax';
 use Dancer::Plugin::FlashMessage;
 use Dancer::Plugin::Database;
+use Dancer::Plugin::Ajax;
 use Template;
 
 use Data::Dumper;
@@ -22,12 +23,18 @@ $consumer->register_provider({
 		url  => 'http://*.youtube.com/*',
 		api  => 'http://www.youtube.com/oembed',
 		});
-get '/video_test' => sub {
-	my $link = "https://www.youtube.com/watch?v=3ETxM33dV9o";
+
+ajax '/video/preview' => sub {
+	header 'Content-Type' => 'application/json';
+	
+	my $link = params->{vlink}; # sent via jquery
+print STDERR $link."\n\n";
+#	$link = "https://www.youtube.com/watch?v=0ZgjmE6xdaw&list=PLenpQ_zBUIjMxAKDqMMpR5mt7QOlx-QEY&index=14";
 	my $embeded = Meet::App->get_embeded_content($link);
 	
-	flash('error', "Couldn't embed the provided link '$link'.") unless $embeded;
-	return template('test', { embeded => $embeded});
+        return to_json { type => "error", text => "Couldn't embed the provided link '$link'."} unless $embeded;
+        return to_json { type => "ok", text => "Found the video link.", embeded => $embeded};
+	
 };
 
 sub get_embeded_content {
@@ -37,7 +44,8 @@ sub get_embeded_content {
 	return undef if $link !~ /^https?:\/\//;
 
 	my $embeded;
-	my $response = eval { $consumer->embed($link) };
+	my $response = eval { $consumer->embed($link, {format => 'xml'}) };
+print STDERR Dumper($response);
 	if ($response) {
 		$embeded = $response->render;  # handy shortcut to generate <img/> tag
 	} else {

@@ -39,15 +39,44 @@ $categories
 							<h4 class="border-top" title="Upload photos">Photos</h4>
 							<p>Upload up to 3 photos in JPG/JPEG/GIF/PNG format under 5MB each. Photos will be compressed and scaled so they will fit to the page.</p>
 % for my $i (qw/1 2 3/) {
-							<p><input type=file name="photo_<% $i %>"></p>
-% }                                
+							<p><input type=file class="upload_photo" id="photo_<% $i %>" name="photo_<% $i %>"></p>
+% }  
 							<h4 class="border-top" title="Upload photos">Video</h4>
 <p>
-							<p>Sorry guys, not ready yet :-/ <br>You can add a link to youtube which will be embedded as soon as possible and at least displayed until that.</p>
-							<input type="textfield" name="video_link" placeholder="Link to a video" id="video_link" style="width:100%;"/>
+							<p>You can add a link to youtube video. So far it is limited to the domain www.youtube.com and it must not be a link to playlist or it will display the first video :-/ I will fix it later.</p>
+							<input type="textfield" name="video_link" placeholder="Link to a video" id="video_link" onChange="embed_video_link(this.value);" style="width:100%;"/>
+     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+    function embed_video_link(link) {
+	if (link) {
+		    jQuery.ajax({
+			url : '/video/preview',
+			data: {
+				vlink : link
+			},
+			dataType: 'json',
+			contentType: 'application/json',
+			success: function(data) {
+				if (data["type"] == "error") {
+					$("#video_preview").html(data["text"]);
+				} else {
+					$("#video_preview").html(data["embeded"]);
+				}
+			},
+			error: function() {
+				$("#video_preview").html("Something went wrong...");
+			}
+		});
+	} else {
+		$("#video_preview").html("");
+	}
+return false;
+}
+</script>
 </p>
 						</div><!-- // .box-info -->
-
+						<div class="video_preview box-info" id="video_preview">
+						</div>
 						<div class="box-info">
 							<p>
 									<input type="submit" name="save" value="Save" class="button full"/>
