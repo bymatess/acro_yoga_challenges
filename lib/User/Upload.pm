@@ -28,8 +28,8 @@ ajax '/video/preview' => sub {
 	header 'Content-Type' => 'application/json';
 	
 	my $link = params->{vlink}; # sent via jquery
-print STDERR $link."\n\n";
 #	$link = "https://www.youtube.com/watch?v=0ZgjmE6xdaw&list=PLenpQ_zBUIjMxAKDqMMpR5mt7QOlx-QEY&index=14";
+
 	my $embeded = Meet::App->get_embeded_content($link);
 	
         return to_json { type => "error", text => "Couldn't embed the provided link '$link'."} unless $embeded;
@@ -45,15 +45,18 @@ sub get_embeded_content {
 
 	my $embeded;
 	my $response = eval { $consumer->embed($link, {format => 'xml'}) };
-print STDERR Dumper($response);
+	
 	if ($response) {
 		$embeded = $response->render;  # handy shortcut to generate <img/> tag
+		# this is not really nice but it's working :-) TODO
+		$embeded =~ s/width="480"/width="100%"/;
+		$embeded =~ s/height="270"/height="480"/;
+		return $embeded;
 	} else {
 		# todo default fallback video
-		print STDERR "not working\n";
+		# print STDERR "not working\n";
+		return;
 	}
-	
-	return $embeded;
 }
 
 1;

@@ -101,14 +101,12 @@ $photos
 			</div><!-- // .desktop-3 .nested -->
 
 			<div class="desktop-9 tablet-12 columns">
+				<!-- Place for a embeded video --!>
+				<% $position->{video_link} %>
 % for my $id (@{$photos}) {
 
 				<img src="/position/images/<% $id->[0] %>" alt="" />
 % }                                
-% if ($position->{video_link}) {
-	Video probably not working yet :-( I will fix it later...<br/>
-	<iframe width="400" height="300" src="<% $position->{video_link} %>"></iframe>
-% }
 
 			</div><!-- // .desktop-9 -->
 

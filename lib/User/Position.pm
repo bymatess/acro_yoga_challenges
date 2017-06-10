@@ -28,6 +28,8 @@ WHERE position.id = ?");
         $position_sth->execute($position_id);
         my $position = $position_sth->fetchrow_hashref();
 print STDERR Dumper($position);
+	$position->{video_link} = Meet::App->get_embeded_content($position->{video_link}) if $position->{video_link};
+
 	my $sth = database->prepare("select id from p_photo where position_id = ?");
         $sth->execute($position_id);
         my $photos = $sth->fetchall_arrayref();
