@@ -37,27 +37,25 @@ print STDERR Dumper($position);
 
 post "/upload_position" => sub {
 	my $user = session('user');
-
+print STDERR Dumper(params);
 	my $new_id;
 	my $success;
 	flash error => "Please fill in the name." if (!params->{name});
 	flash error => "Please choose a category." if (!params->{category});
 	flash error => "Choosen category is not valid." if (params->{category} !~ /^\d+$/);
-	flash error => "Please upload at least one photo of the position or link a video." if (!params->{photo_1} && !params->{photo_2} && !params->{photo_3} && !params->{video_link});
+	flash error => "Please upload at least one photo of the position or link a video." if (!params->{"filesToUpload[]"} && !params->{video_link});
 	flash error => "Description is too long." if (length(params->{description}) > 500);
 	flash error => "Please link a http://www.youtube.com/ video only." if (defined params->{video_link} && params->{video_link} ne "" && params->{video_link} !~ /^https?:\/\/(www)?\.youtube\.com\//i);
 
 	my $MAX_PHOTO_SIZE = 5000000;
 	my $photos;
-	foreach my $i (qw/1 2 3/) {
-		my $file = "photo_$i";
-		next unless params->{$file};
-
-		$photos->{$file} = request->upload($file);
-		if ($photos->{$file}->size > $MAX_PHOTO_SIZE) {
+	foreach my $file (request->upload("filesToUpload[]")) {
+		my $filename = $file->filename;
+		$photos->{$filename} = $file;
+		if ($photos->{$filename}->size > $MAX_PHOTO_SIZE) {
 			flash error => "Photo is too big. Max. upload size is 5Mb.";
-		} elsif ($photos->{$file}->headers->{'Content-Type'} !~ /image/i){
-# TODO more secure checking, not just the header it's stupid and pdf with .jpg will go through;
+		} elsif ($photos->{$filename}->headers->{'Content-Type'} !~ /image/i){
+			# TODO more secure checking, not just the header it's stupid and pdf with .jpg will go through;
 			flash error => "A file you are trying to upload is not a picture.";
 		}
 	}
@@ -72,8 +70,6 @@ post "/upload_position" => sub {
 			params->{video_link}
 		     );
 	my $position_id = database->last_insert_id(undef, undef, 'position', undef) || '';
-
-	#return template("upload_position", {}) if (session->{_flash}->{error});
 
 	foreach my $key (keys %$photos) {
 		my $file = $key;

@@ -37,10 +37,42 @@ $categories
 							</p>
 							</p>
 							<h4 class="border-top" title="Upload photos">Photos</h4>
-							<p>Upload up to 3 photos in JPG/JPEG/GIF/PNG format under 5MB each. Photos will be compressed and scaled so they will fit to the page.</p>
-% for my $i (qw/1 2 3/) {
-							<p><input type=file class="upload_photo" id="photo_<% $i %>" name="photo_<% $i %>"></p>
-% }  
+							<p>Upload up to 3 photos in JPG/JPEG/GIF/PNG format under 5MB each. Photos will be compressed and scaled (TODO) so they will fit to the page.</p>
+							<p><input type="file" name="filesToUpload[]" id="filesToUpload" multiple="" onChange="makeFileList();" accept="image/jpg,image/png,image/jpeg,image/gif"/></p>
+							<p><strong>Files You Selected:</strong></p>
+								<ul id="fileList"><li>No Files Selected</li></ul>
+	<script type="text/javascript">
+		function makeFileList() {
+			var input = document.getElementById("filesToUpload");
+			var ul = document.getElementById("fileList");
+			var error = 0;
+			while (ul.hasChildNodes()) {
+				ul.removeChild(ul.firstChild);
+			}
+			for (var i = 0; i < input.files.length; i++) {
+				var li = document.createElement("li");
+				var msg = "File will be uploaded.";
+				if ((input.files[i].size / (1000000)) > 5) {
+					$(li).addClass("contact-warning");
+					msg = "File is TOO BIG.";
+					error = 1;
+				} else {
+					$(li).addClass("contact-success");
+				}
+				li.innerHTML = input.files[i].name + ", size: ~" + parseInt(input.files[i].size / (1000000)) + "MB -- " + msg;
+				ul.appendChild(li);
+			}
+			if (error == 1) {
+				document.getElementById("filesToUpload").value = "";
+			}
+			if(!ul.hasChildNodes()) {
+				var li = document.createElement("li");
+				li.innerHTML = 'No Files Selected';
+				ul.appendChild(li);
+			}
+		}
+	</script>
+		
 							<h4 class="border-top" title="Upload photos">Video</h4>
 <p>
 							<p>You can add a link to youtube video. So far it is limited to the domain www.youtube.com and it must not be a link to playlist or it will display the first video :-/ I will fix it later.</p>

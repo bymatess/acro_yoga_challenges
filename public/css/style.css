@@ -1347,22 +1347,26 @@ b, strong { font-weight: bold; }
 
 
 
-	div.contact-warning {
+	div.contact-warning,
+	li.contact-warning {
 			color: white;
 			background: #ee3a22;
 			padding: 20px 25px;
 			margin-bottom: 30px;
 	}
-	div.contact-warning:empty {
+	div.contact-warning:empty, 
+	li.contact-warning:empty {
 		display:none;
 	}
-	div.contact-success {
+	div.contact-success,
+	li.contact-success {
 			color: #22eedd;
 			background: #111;
 			padding: 20px 25px;
 			margin-bottom: 30px;
 	}
-	div.contact-success:empty {
+	div.contact-success:empty,
+	li.contact-success:empty {
 		display:none;
 	}
 

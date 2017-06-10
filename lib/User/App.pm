@@ -11,6 +11,24 @@ use Net::Facebook::Oauth2;
 use Data::Dumper;
 our $VERSION = '0.1';
 
+post "/test" => sub {
+print STDERR Dumper(params);
+	my $photos;
+	foreach my $i (qw/1 2 3/) {
+		my $file = "photo_$i";
+		next unless params->{$file};
+
+		$photos->{$file} = request->upload($file);
+		if ($photos->{$file}->size > 500000) {
+			flash error => "Photo is too big. Max. upload size is 5Mb.";
+		} elsif ($photos->{$file}->headers->{'Content-Type'} !~ /image/i){
+# TODO more secure checking, not just the header it's stupid and pdf with .jpg will go through;
+			flash error => "A file you are trying to upload is not a picture.";
+		}
+	}
+
+	return template('test');
+};
 
 get "/test" => sub {
 	return template('test');
