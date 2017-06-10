@@ -124,6 +124,7 @@ $categories => ()
 							Profile
 						</a>
 						<ul>
+							<li><a class=navigation-login href="/my_challenges">My challenges</a> </li>
 							<li><a class=navigation-login href="/signout">Sign&nbsp;out</a> </li>
 						</ul>
 % } else {

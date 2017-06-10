@@ -124,7 +124,7 @@ sub send_mail {
 
 hook 'before_template_render' => sub {
 	my $tokens = shift;
-	my @categories = database->quick_select('category', { }, {columns => ['id', 'name'], order_by => 'name'});
+	my @categories = database->quick_select('category', { }, {columns => ['id', 'name'], order_by => 'id'});
 	$tokens->{categories} = \@categories;
 	vars->{categories} = \@categories;
 };

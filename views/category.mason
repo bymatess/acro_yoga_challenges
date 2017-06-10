@@ -30,5 +30,11 @@ Newest challenges in category:<br>
 % 	} else {
 %		$i++;
 %	}
+% }
+
+% if ($i eq 0) {
+	<div class="contact-warning" title="Challenge not completed yet">
+		No challenge here yet, what about uploading one?
+	</div>
 % }                                
 			

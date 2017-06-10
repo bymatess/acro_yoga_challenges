@@ -2,7 +2,7 @@
 $settings
 $session
 $request
-$positions => [['2', 'Bird', 'L-pose']] #arrayref of arrayrefs 
+$positions => [] #arrayref of arrayrefs 
 </%args>
 			<div class="desktop-12 columns">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed e

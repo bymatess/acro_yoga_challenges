@@ -1,0 +1,28 @@
+<%args>
+$settings
+$session
+$request
+$positions #hashref 
+</%args>
+<div class="desktop-12 columns">
+Here you can see all your accepted (red) and already completed (black) challenges, sorted by name in categories.
+	<div class="border-top"></div>
+	<div class="clear"></div>
+% my $last_category;
+% for my $position_id (sort {$positions->{$a}->{category_id} cmp $positions->{$b}->{category_id} || $positions->{$a}->{name} cmp $positions->{$b}->{name}} keys %$positions) {
+% if (!$last_category || $last_category ne $positions->{$position_id}->{category_id}) {
+	<div class="border-top"></div>
+	<h2><% $positions->{$position_id}->{category_name} %></h2>
+% }
+		<a href="/position/<% $position_id %>" class="permalink">
+% 	if ($positions->{$position_id}->{completed}) {
+			<div class="contact-success" title="Challenge already completed">
+% 	} else {
+			<div class="contact-warning" title="Challenge not completed yet">
+% 	}
+				<h3><% $positions->{$position_id}->{name} %></h3>
+			</div>
+		</a>
+% }                                
+			
+</div>

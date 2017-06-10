@@ -35,6 +35,26 @@ print STDERR Dumper($position);
 	return template('position', {position => $position, photos => $photos});
 };
 
+get "/my_challenges" => sub {
+	my $user = session('user');
+	my $positions_sth = database->prepare("select 
+accepted_challenge.accepted as accepted,
+accepted_challenge.completed as completed,
+position.id as position_id,
+position.name as name,
+category.name as category_name,
+category.id as category_id
+FROM accepted_challenge
+LEFT JOIN position ON accepted_challenge.position_id = position.id
+LEFT JOIN category ON position.category_id = category.id
+WHERE accepted_challenge.user_id = ?
+");
+        $positions_sth->execute($user->{id});
+        my $positions = $positions_sth->fetchall_hashref('position_id');
+print STDERR Dumper($positions);
+	return template('my_challenges', {positions => $positions});
+};
+
 post "/upload_position" => sub {
 	my $user = session('user');
 print STDERR Dumper(params);
