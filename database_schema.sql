@@ -50,8 +50,8 @@ CREATE TABLE `category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(128) COLLATE utf8_bin NOT NULL,
   `description` varchar(512) COLLATE utf8_bin DEFAULT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` datetime NOT NULL ,
+  `updated` datetime NOT NULL ,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Categories of the poses';
@@ -94,8 +94,8 @@ CREATE TABLE `fb_users` (
   `timezone` int(11) DEFAULT NULL,
   `profile_link` varchar(256) COLLATE utf8_bin DEFAULT NULL,
   `gender` tinyint(1) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_login` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` datetime NOT NULL ,
+  `last_login` datetime NOT NULL ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Store basic information about users';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -130,8 +130,8 @@ CREATE TABLE `position` (
   `description` varchar(512) COLLATE utf8_bin DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` datetime NOT NULL ,
+  `updated` datetime NOT NULL ,
   `video_link` varchar(1024) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
@@ -242,8 +242,8 @@ CREATE TABLE `users` (
   `locale` varchar(32) COLLATE utf8_bin DEFAULT NULL,
   `timezone` int(11) DEFAULT NULL,
   `profile_link` varchar(256) COLLATE utf8_bin DEFAULT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_login` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` datetime NOT NULL ,
+  `last_login` datetime NOT NULL ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Store basic information about users';
 /*!40101 SET character_set_client = @saved_cs_client */;

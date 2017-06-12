@@ -165,7 +165,7 @@ get '/fb_log' => sub {
 	my $fb = Net::Facebook::Oauth2->new(
 				application_id     => $app_id, 
 				application_secret => $app_secret,
-				callback           => 'http://localhost:3000/fb_log'
+				callback           => request->uri_base().'/fb_log'
 	);
 	my $access_token = $fb->get_access_token(code => $fb_token);
 
@@ -210,7 +210,7 @@ get '/fb_login' => sub {
 	my $fb = Net::Facebook::Oauth2->new(
 			application_id     => $app_id, 
 			application_secret => $app_secret,
-			callback           => 'http://localhost:3000/fb_log'
+			callback           => request->uri_base().'/fb_log'
 			);
 
 	# get the authorization URL for your application
